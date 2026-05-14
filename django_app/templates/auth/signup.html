@@ -1,0 +1,144 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Sign Up - Mindello{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+            <div class="card shadow-lg border-0">
+                <div class="card-body p-5">
+                    <div class="text-center mb-4">
+                        <h2 class="mb-2" style="color: #059669; font-weight: 700;">Mindello</h2>
+                        <p class="text-muted">AI-Powered ASD Screening Platform</p>
+                        <hr class="my-4">
+                        <h4 class="mb-3">Create Your Account</h4>
+                    </div>
+
+                    {% if form.non_field_errors %}
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            {% for error in form.non_field_errors %}
+                                <strong>Error:</strong> {{ error }}
+                            {% endfor %}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endif %}
+
+                    <form method="post" novalidate>
+                        {% csrf_token %}
+
+                        <!-- Role Selection -->
+                        <div class="mb-4">
+                            <label class="form-label fw-600">I am a...</label>
+                            <div class="row">
+                                {% for value, label in form.role.field.choices %}
+                                    <div class="col-12 mb-3">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="radio" name="role" id="id_role_{{ forloop.counter }}" value="{{ value }}" required>
+                                            <label class="form-check-label w-100" for="id_role_{{ forloop.counter }}">
+                                                <strong>{{ label }}</strong>
+                                            </label>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            {% if form.role.errors %}
+                                <div class="text-danger small">{{ form.role.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <hr class="my-4">
+
+                        <!-- Personal Info -->
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}
+                                    <div class="text-danger small">{{ form.first_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}
+                                    <div class="text-danger small">{{ form.last_name.errors }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.email }}
+                            {% if form.email.errors %}
+                                <div class="text-danger small">{{ form.email.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.username }}
+                            {% if form.username.errors %}
+                                <div class="text-danger small">{{ form.username.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div class="mb-3">
+                            {{ form.phone }}
+                            {% if form.phone.errors %}
+                                <div class="text-danger small">{{ form.phone.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <div id="organization-field" class="mb-3" style="display: none;">
+                            {{ form.organization }}
+                            {% if form.organization.errors %}
+                                <div class="text-danger small">{{ form.organization.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <!-- Passwords -->
+                        <div class="mb-3">
+                            {{ form.password1 }}
+                            {% if form.password1.errors %}
+                                <div class="text-danger small">{{ form.password1.errors }}</div>
+                            {% endif %}
+                            <small class="form-text text-muted d-block mt-2">
+                                • At least 8 characters<br>
+                                • Cannot be entirely numeric<br>
+                                • Cannot be too similar to your username
+                            </small>
+                        </div>
+
+                        <div class="mb-4">
+                            {{ form.password2 }}
+                            {% if form.password2.errors %}
+                                <div class="text-danger small">{{ form.password2.errors }}</div>
+                            {% endif %}
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 py-2 fw-600" style="background-color: #059669;">
+                            Create Account
+                        </button>
+                    </form>
+
+                    <p class="text-center mt-4">
+                        Already have an account? <a href="{% url 'auth:login' %}" class="text-success fw-600">Sign in</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Show/hide organization field based on role
+    document.querySelectorAll('input[name="role"]').forEach(radio => {
+        radio.addEventListener('change', function() {
+            const orgField = document.getElementById('organization-field');
+            if (this.value === 'doctor') {
+                orgField.style.display = 'block';
+            } else {
+                orgField.style.display = 'none';
+            }
+        });
+    });
+</script>
+{% endblock %}

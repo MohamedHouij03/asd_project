@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% block title %}About · NeuroScan ASD{% endblock %}
+
+{% block content %}
+<div style="max-width:820px;margin:0 auto;padding:3rem 1.5rem 5rem;">
+
+  <div class="mono-label">Project Overview</div>
+  <h1 class="section-title" style="margin-bottom:0.5rem;">About NeuroScan ASD</h1>
+  <p style="color:var(--text-muted);font-size:0.95rem;line-height:1.8;margin-bottom:2.5rem;">
+    An end-to-end machine learning web application for screening Autism Spectrum Disorder (ASD)
+    indicators in children, built with Django, scikit-learn, and a modern research pipeline.
+  </p>
+
+  <div class="card-dark mb-3 fade-up">
+    <div class="mono-label" style="margin-bottom:0.75rem;">The Dataset</div>
+    <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.75;margin:0;">
+      The dataset is sourced from the <strong style="color:var(--text-primary);">University of Arkansas Computer Science Department</strong>
+      as part of autism research. It contains clinical and behavioral measurements for children,
+      including the AQ-10 Autism Spectrum Quotient, Q-CHAT-10 score, Childhood Autism Rating Scale (CARS),
+      demographic information, and a range of co-occurring conditions such as speech delay, learning disorders,
+      genetic disorders, and anxiety.
+    </p>
+  </div>
+
+  <div class="card-dark mb-3 fade-up fade-up-delay-1">
+    <div class="mono-label" style="margin-bottom:0.75rem;">ML Pipeline</div>
+    <div style="font-size:0.88rem;color:var(--text-muted);line-height:1.75;">
+      <p>The machine learning pipeline consists of four stages documented in Jupyter notebooks:</p>
+      <ol style="padding-left:1.25rem;margin:0.5rem 0 0;">
+        <li><strong style="color:var(--text-primary);">Exploratory Data Analysis (01_eda.ipynb)</strong> — Understanding distributions, missing values, class balance, and correlations.</li>
+        <li style="margin-top:0.5rem;"><strong style="color:var(--text-primary);">Preprocessing (02_preprocessing.ipynb)</strong> — Label encoding, standard scaling, and feature engineering.</li>
+        <li style="margin-top:0.5rem;"><strong style="color:var(--text-primary);">Modeling (03_modeling.ipynb)</strong> — Training Logistic Regression, Decision Tree, Random Forest, KNN, and SVM.</li>
+        <li style="margin-top:0.5rem;"><strong style="color:var(--text-primary);">Evaluation (04_evaluation.ipynb)</strong> — Comparing accuracy, F1, precision, recall, and confusion matrices.</li>
+      </ol>
+    </div>
+  </div>
+
+  <div class="card-dark mb-3 fade-up fade-up-delay-2">
+    <div class="mono-label" style="margin-bottom:0.75rem;">Best Model: Random Forest</div>
+    <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.75;margin:0;">
+      After evaluating all five classifiers, <strong style="color:var(--accent);">Random Forest</strong> was selected as the production model
+      with <strong style="color:var(--accent);">97% accuracy</strong> on the held-out test set. It offers the best trade-off between
+      precision and recall, handles both numerical and categorical features robustly, provides
+      feature importance scores, and is resistant to overfitting via ensemble averaging.
+    </p>
+  </div>
+
+  <div class="card-dark mb-3 fade-up fade-up-delay-2">
+    <div class="mono-label" style="margin-bottom:0.75rem;">Tech Stack</div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;">
+      {% for tech in "Django 4.2,scikit-learn,Pandas,NumPy,Matplotlib,Seaborn,Joblib,Bootstrap 5,Jupyter,SQLite,Python 3"|split:"," %}
+      <span class="badge-mono">{{ tech }}</span>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="alert-dark fade-up">
+    <i class="bi bi-exclamation-triangle me-2"></i>
+    <strong>Disclaimer:</strong> This tool is for <strong>research and educational purposes only</strong>.
+    It is not a clinical diagnostic tool and should not replace professional medical evaluation.
+    Always consult a qualified healthcare provider for diagnosis.
+  </div>
+
+  <div style="margin-top:2rem;text-align:center;">
+    <a href="{% url 'ml_app:predict' %}" class="btn-primary-glow me-3">
+      <i class="bi bi-cpu me-2"></i>Try the Screening
+    </a>
+    <a href="{% url 'ml_app:dashboard' %}" class="btn-outline-glow">
+      <i class="bi bi-bar-chart me-2"></i>View Dashboard
+    </a>
+  </div>
+
+</div>
+{% endblock %}
