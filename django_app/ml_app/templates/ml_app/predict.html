@@ -378,6 +378,15 @@
         Complete the form and click "Run ASD Screening" to get a prediction.
       </div>
 
+      <div id="xaiNarrative" style="display:none;font-size:0.8rem;color:var(--text-primary);margin-bottom:0.8rem;"></div>
+
+      <div id="xaiTopFactors" style="display:none;margin-bottom:1rem;"></div>
+
+      <div id="xaiChartWrap" style="display:none;">
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.4rem;">Feature contribution bars</div>
+        <img id="xaiChart" alt="Feature contribution chart" style="width:100%;border-radius:8px;border:1px solid var(--border);">
+      </div>
+
       <div class="confidence-bar-wrap" id="confSection" style="display:none;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
           <span style="font-size:0.78rem;color:var(--text-muted);">Confidence</span>
@@ -423,8 +432,8 @@
       </div>
     </div>
 
-    <a href="{% url 'ml_app:history' %}" class="btn-outline-glow mt-3 w-100 text-center" style="display:block;padding:0.6rem;">
-      <i class="bi bi-clock-history me-1"></i>View History
+    <a href="{% url 'ml_app:dashboard' %}" class="btn-outline-glow mt-3 w-100 text-center" style="display:block;padding:0.6rem;">
+      <i class="bi bi-bar-chart-line me-1"></i>View Dashboard
     </a>
   </div>
 
@@ -448,6 +457,10 @@ const confBar = document.getElementById('confBar');
 const resultMeta = document.getElementById('resultMeta');
 const resultModelNote = document.getElementById('resultModelNote');
 const resultTimestamp = document.getElementById('resultTimestamp');
+const xaiNarrative = document.getElementById('xaiNarrative');
+const xaiTopFactors = document.getElementById('xaiTopFactors');
+const xaiChartWrap = document.getElementById('xaiChartWrap');
+const xaiChart = document.getElementById('xaiChart');
 
 form.addEventListener('submit', async (e) => {
   e.preventDefault();
@@ -510,6 +523,28 @@ function showResult(data) {
   resultModelNote.innerHTML = `<span class="badge-mono">${data.note === 'model' ? '✓ RF Model' : '⚡ Demo'}</span>`;
   resultTimestamp.textContent = new Date().toLocaleTimeString();
 
+  // XAI text
+  if (data.explanation_text) {
+    xaiNarrative.style.display = 'block';
+    xaiNarrative.textContent = data.explanation_text;
+  }
+
+  // Top factors list
+  if (Array.isArray(data.top_factors) && data.top_factors.length) {
+    xaiTopFactors.style.display = 'block';
+    const chips = data.top_factors.map((f, i) => {
+      const arrow = f.direction === 'decrease' ? '↓' : '↑';
+      return `<span class="badge-mono" style="margin-right:6px;margin-bottom:6px;display:inline-block;">${i + 1}. ${f.feature} ${arrow}</span>`;
+    }).join('');
+    xaiTopFactors.innerHTML = chips;
+  }
+
+  // Contribution chart
+  if (data.contrib_chart) {
+    xaiChartWrap.style.display = 'block';
+    xaiChart.src = `data:image/png;base64,${data.contrib_chart}`;
+  }
+
   // Scroll to result on mobile
   if (window.innerWidth <= 900) {
     resultCard.scrollIntoView({ behavior: 'smooth', block: 'start' });
@@ -525,6 +560,9 @@ function showError(msg) {
   resultDesc.textContent = msg;
   confSection.style.display = 'none';
   resultMeta.style.display = 'none';
+  xaiNarrative.style.display = 'none';
+  xaiTopFactors.style.display = 'none';
+  xaiChartWrap.style.display = 'none';
 }
 </script>
 {% endblock %}

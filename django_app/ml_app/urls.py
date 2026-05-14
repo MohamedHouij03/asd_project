@@ -9,5 +9,4 @@ urlpatterns = [
     path('dashboard/', views.dashboard, name='dashboard'),
     path('predict/', views.predict, name='predict'),
     path('predict/api/', views.predict_api, name='predict_api'),
-    path('history/', views.history, name='history'),
 ]

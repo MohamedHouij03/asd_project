@@ -77,10 +77,10 @@
     <a class="sidebar-link" href="#heatmap"><i class="bi bi-grid-3x3"></i> Heatmap</a>
     <a class="sidebar-link" href="#models"><i class="bi bi-diagram-3"></i> Models</a>
     <a class="sidebar-link" href="#features"><i class="bi bi-list-stars"></i> Features</a>
+    <a class="sidebar-link" href="#xai"><i class="bi bi-lightbulb"></i> XAI</a>
     <a class="sidebar-link" href="#data-table"><i class="bi bi-table"></i> Data Sample</a>
     <div class="sidebar-label">Navigation</div>
     <a class="sidebar-link" href="{% url 'ml_app:predict' %}"><i class="bi bi-cpu"></i> Predict</a>
-    <a class="sidebar-link" href="{% url 'ml_app:history' %}"><i class="bi bi-clock-history"></i> History</a>
     <a class="sidebar-link" href="{% url 'ml_app:about' %}"><i class="bi bi-info-circle"></i> About</a>
   </aside>
 
@@ -133,6 +133,69 @@
         <i class="bi bi-info-circle me-2"></i>
         Dataset not found at <code>data/data_csv.csv</code>. Download from Kaggle and place it there to see charts.
       </div>
+
+      {% if charts.shap_summary or charts.shap_beeswarm or charts.shap_waterfall or charts.pdp_age %}
+      <div class="row g-3 mb-3" id="xai">
+        {% if charts.shap_summary %}
+        <div class="col-lg-6">
+          <div class="chart-card fade-up">
+            <div class="chart-card-header">
+              <span class="chart-card-title">SHAP Summary</span>
+              <span class="badge-mono">Global XAI</span>
+            </div>
+            <div class="chart-card-body">
+              <img src="data:image/png;base64,{{ charts.shap_summary }}" alt="SHAP Summary">
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if charts.shap_beeswarm %}
+        <div class="col-lg-6">
+          <div class="chart-card fade-up fade-up-delay-1">
+            <div class="chart-card-header">
+              <span class="chart-card-title">SHAP Beeswarm</span>
+              <span class="badge-mono">Feature Spread</span>
+            </div>
+            <div class="chart-card-body">
+              <img src="data:image/png;base64,{{ charts.shap_beeswarm }}" alt="SHAP Beeswarm">
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="row g-3 mb-3">
+        {% if charts.shap_waterfall %}
+        <div class="col-lg-6">
+          <div class="chart-card fade-up">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Waterfall (Sample Prediction)</span>
+              <span class="badge-mono">Local XAI</span>
+            </div>
+            <div class="chart-card-body">
+              <img src="data:image/png;base64,{{ charts.shap_waterfall }}" alt="SHAP Waterfall">
+            </div>
+          </div>
+        </div>
+        {% endif %}
+
+        {% if charts.pdp_age %}
+        <div class="col-lg-6">
+          <div class="chart-card fade-up fade-up-delay-1">
+            <div class="chart-card-header">
+              <span class="chart-card-title">Partial Dependence Plot</span>
+              <span class="badge-mono">PDP</span>
+            </div>
+            <div class="chart-card-body">
+              <img src="data:image/png;base64,{{ charts.pdp_age }}" alt="PDP Age">
+            </div>
+          </div>
+        </div>
+        {% endif %}
+      </div>
+      {% endif %}
+
       {% endif %}
 
       <!-- ── Row 1: ASD Distribution + Age Distribution ── -->

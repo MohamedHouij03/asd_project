@@ -11,6 +11,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import seaborn as sns
+from sklearn.inspection import PartialDependenceDisplay
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
@@ -33,6 +34,7 @@ if ML_MODELS_DIR not in sys.path:
 
 # ─── Lazy-load the ML pipeline ────────────────────────────────────────────────
 _pipeline = None
+_shap_explainer = None
 
 def get_pipeline():
     """Load ML pipeline once and cache it (singleton pattern)."""
@@ -49,6 +51,26 @@ def get_pipeline():
     return _pipeline
 
 
+def get_shap_explainer():
+    """Lazy-load SHAP explainer for the classifier in the pipeline."""
+    global _shap_explainer
+    if _shap_explainer is not None:
+        return _shap_explainer
+
+    pipeline = get_pipeline()
+    if pipeline is None:
+        return None
+
+    try:
+        import shap
+        model = pipeline.named_steps.get('classifier') if hasattr(pipeline, 'named_steps') else pipeline
+        _shap_explainer = shap.TreeExplainer(model)
+    except Exception as e:
+        logger.warning(f"SHAP explainer unavailable: {e}")
+        _shap_explainer = None
+    return _shap_explainer
+
+
 def _fig_to_base64(fig):
     """Convert matplotlib figure to base64 string for embedding in HTML."""
     buf = io.BytesIO()
@@ -58,6 +80,257 @@ def _fig_to_base64(fig):
     buf.close()
     plt.close(fig)
     return base64.b64encode(img_bytes).decode('utf-8')
+
+
+def _pipeline_feature_row(data):
+    """Build exactly the feature row expected by the trained pipeline."""
+    row = {
+        'A1': int(data['a1_score']),
+        'A2': int(data['a2_score']),
+        'A3': int(data['a3_score']),
+        'A4': int(data['a4_score']),
+        'A5': int(data['a5_score']),
+        'A6': int(data['a6_score']),
+        'A7': int(data['a7_score']),
+        'A8': int(data['a8_score']),
+        'A9': int(data['a9_score']),
+        'A10_Autism_Spectrum_Quotient': int(data['a10_score']),
+        'Social_Responsiveness_Scale': float(data.get('social_responsiveness_scale') or 0),
+        'Age_Years': float(data['age']),
+        'Qchat_10_Score': int(data['qchat_10_score']),
+        'Childhood Autism Rating Scale': float(data['childhood_autism_rating_scale']),
+        'Sex': 1 if data['sex'] == 'm' else 0,
+        'Jaundice': 1 if data['jaundice'] == '1' else 0,
+        'Family_mem_with_ASD': 1 if data['family_mem_with_asd'] == '1' else 0,
+        'Speech Delay/Language Disorder': 1 if data['speech_delay'] == '1' else 0,
+        'Learning disorder': 1 if data['learning_disorder'] == '1' else 0,
+        'Genetic_Disorders': 1 if data['genetic_disorders'] == '1' else 0,
+        'Depression': 1 if data['depression'] == '1' else 0,
+        'Global developmental delay/intellectual disability': 1 if data['global_developmental_delay'] == '1' else 0,
+        'Social/Behavioural Issues': 1 if data['social_behavioural_issues'] == '1' else 0,
+        'Anxiety_disorder': 1 if data['anxiety_disorder'] == '1' else 0,
+    }
+    return pd.DataFrame([row])
+
+
+def _get_feature_names(pipeline, input_df):
+    names = list(getattr(pipeline, 'feature_names_in_', []))
+    if names:
+        return names
+    return list(input_df.columns)
+
+
+def _xai_fallback_from_importance(pipeline, input_df):
+    model = pipeline.named_steps.get('classifier') if hasattr(pipeline, 'named_steps') else pipeline
+    names = _get_feature_names(pipeline, input_df)
+    values = input_df.iloc[0].to_dict()
+
+    if hasattr(model, 'feature_importances_'):
+        base_imp = np.asarray(model.feature_importances_)
+        contrib = np.abs(base_imp[:len(names)] * np.asarray([values[n] for n in names]))
+    elif hasattr(model, 'coef_'):
+        coefs = np.abs(np.asarray(model.coef_)[0][:len(names)])
+        contrib = np.abs(coefs * np.asarray([values[n] for n in names]))
+    else:
+        contrib = np.asarray([abs(float(values[n])) for n in names])
+
+    items = []
+    for i, name in enumerate(names):
+        items.append({'feature': name, 'value': float(values[name]), 'contribution': float(contrib[i]), 'direction': 'increase'})
+    items.sort(key=lambda x: abs(x['contribution']), reverse=True)
+    return items
+
+
+def _xai_local_explanation(pipeline, input_df):
+    """Return feature contributions for one prediction using SHAP when available."""
+    feature_names = _get_feature_names(pipeline, input_df)
+    values = input_df[feature_names].iloc[0].to_dict()
+
+    explainer = get_shap_explainer()
+    if explainer is None:
+        return _xai_fallback_from_importance(pipeline, input_df)
+
+    try:
+        X = input_df[feature_names]
+        shap_vals = explainer.shap_values(X)
+        if isinstance(shap_vals, list):
+            sv = np.asarray(shap_vals[-1])[0]
+        else:
+            arr = np.asarray(shap_vals)
+            if arr.ndim == 3:
+                sv = arr[0, :, -1]
+            else:
+                sv = arr[0]
+
+        items = []
+        for i, name in enumerate(feature_names):
+            val = float(values[name])
+            c = float(sv[i])
+            items.append({
+                'feature': name,
+                'value': val,
+                'contribution': c,
+                'direction': 'increase' if c >= 0 else 'decrease',
+            })
+        items.sort(key=lambda x: abs(x['contribution']), reverse=True)
+        return items
+    except Exception as e:
+        logger.warning(f"SHAP local explanation failed: {e}")
+        return _xai_fallback_from_importance(pipeline, input_df)
+
+
+def _chart_local_contrib(contrib_items, title='Feature Contribution (Local Explanation)'):
+    top = contrib_items[:10]
+    labels = [t['feature'] for t in reversed(top)]
+    vals = [float(t['contribution']) for t in reversed(top)]
+    colors = ['#10b981' if v >= 0 else '#ef4444' for v in vals]
+
+    fig, ax = plt.subplots(figsize=(8, 4.6), facecolor='#0f172a')
+    ax.set_facecolor('#1e293b')
+    ax.barh(labels, vals, color=colors, edgecolor='#0f172a')
+    ax.axvline(0, color='#94a3b8', linewidth=1)
+    ax.set_title(title, color='white', fontsize=12)
+    ax.set_xlabel('Contribution', color='#94a3b8')
+    ax.tick_params(colors='#94a3b8', labelsize=8)
+    for spine in ax.spines.values():
+        spine.set_edgecolor('#334155')
+    fig.tight_layout()
+    return _fig_to_base64(fig)
+
+
+def _chart_shap_summary(df, pipeline):
+    """Global SHAP summary bar chart on sampled dataset."""
+    feature_names = list(getattr(pipeline, 'feature_names_in_', []))
+    if not feature_names:
+        return None
+    missing = [f for f in feature_names if f not in df.columns]
+    if missing:
+        return None
+    sample = df[feature_names].dropna().head(200)
+    if sample.empty:
+        return None
+
+    explainer = get_shap_explainer()
+    if explainer is None:
+        return None
+    try:
+        shap_vals = explainer.shap_values(sample)
+        if isinstance(shap_vals, list):
+            arr = np.asarray(shap_vals[-1])
+        else:
+            arr = np.asarray(shap_vals)
+            if arr.ndim == 3:
+                arr = arr[:, :, -1]
+        mean_abs = np.abs(arr).mean(axis=0)
+        order = np.argsort(mean_abs)[-12:]
+        labels = [feature_names[i] for i in order]
+        vals = [mean_abs[i] for i in order]
+
+        fig, ax = plt.subplots(figsize=(8, 4.8), facecolor='#0f172a')
+        ax.set_facecolor('#1e293b')
+        ax.barh(labels, vals, color='#60a5fa', edgecolor='#0f172a')
+        ax.set_title('SHAP Summary (mean |SHAP|)', color='white', fontsize=12)
+        ax.set_xlabel('Global impact', color='#94a3b8')
+        ax.tick_params(colors='#94a3b8', labelsize=8)
+        for spine in ax.spines.values():
+            spine.set_edgecolor('#334155')
+        fig.tight_layout()
+        return _fig_to_base64(fig)
+    except Exception as e:
+        logger.warning(f"SHAP summary chart failed: {e}")
+        return None
+
+
+def _chart_shap_beeswarm(df, pipeline):
+    """Approximate beeswarm-style scatter using SHAP values."""
+    feature_names = list(getattr(pipeline, 'feature_names_in_', []))
+    if not feature_names:
+        return None
+    missing = [f for f in feature_names if f not in df.columns]
+    if missing:
+        return None
+    sample = df[feature_names].dropna().head(180)
+    if sample.empty:
+        return None
+
+    explainer = get_shap_explainer()
+    if explainer is None:
+        return None
+
+    try:
+        shap_vals = explainer.shap_values(sample)
+        if isinstance(shap_vals, list):
+            arr = np.asarray(shap_vals[-1])
+        else:
+            arr = np.asarray(shap_vals)
+            if arr.ndim == 3:
+                arr = arr[:, :, -1]
+
+        mean_abs = np.abs(arr).mean(axis=0)
+        top_idx = np.argsort(mean_abs)[-8:]
+        top_features = [feature_names[i] for i in top_idx]
+
+        fig, ax = plt.subplots(figsize=(9, 5), facecolor='#0f172a')
+        ax.set_facecolor('#1e293b')
+        y_positions = np.arange(len(top_features))
+        for yi, fi in enumerate(top_idx):
+            xs = arr[:, fi]
+            ys = np.random.normal(loc=y_positions[yi], scale=0.08, size=len(xs))
+            ax.scatter(xs, ys, s=15, alpha=0.5, color='#4ade80')
+
+        ax.set_yticks(y_positions)
+        ax.set_yticklabels(top_features, color='#94a3b8')
+        ax.set_xlabel('SHAP value', color='#94a3b8')
+        ax.set_title('SHAP Beeswarm (Top Features)', color='white', fontsize=12)
+        ax.tick_params(colors='#94a3b8')
+        for spine in ax.spines.values():
+            spine.set_edgecolor('#334155')
+        fig.tight_layout()
+        return _fig_to_base64(fig)
+    except Exception as e:
+        logger.warning(f"SHAP beeswarm chart failed: {e}")
+        return None
+
+
+def _chart_pdp_age(df, pipeline):
+    feature_names = list(getattr(pipeline, 'feature_names_in_', []))
+    if 'Age_Years' not in feature_names:
+        return None
+    missing = [f for f in feature_names if f not in df.columns]
+    if missing:
+        return None
+    sample = df[feature_names].dropna().head(300)
+    if sample.empty:
+        return None
+    try:
+        fig, ax = plt.subplots(figsize=(7, 4), facecolor='#0f172a')
+        ax.set_facecolor('#1e293b')
+        PartialDependenceDisplay.from_estimator(pipeline, sample, ['Age_Years'], ax=ax)
+        ax.set_title('Partial Dependence: Age_Years', color='white', fontsize=12)
+        ax.tick_params(colors='#94a3b8')
+        for spine in ax.spines.values():
+            spine.set_edgecolor('#334155')
+        fig.tight_layout()
+        return _fig_to_base64(fig)
+    except Exception as e:
+        logger.warning(f"PDP chart failed: {e}")
+        return None
+
+
+def _demo_prediction_from_form(data):
+    """Heuristic fallback prediction when model inference fails."""
+    aq_total = sum(int(data[f'a{i}_score']) for i in range(1, 11))
+    qchat = int(data['qchat_10_score'])
+    cars = float(data['childhood_autism_rating_scale'])
+    risk_score = (aq_total / 10) * 0.4 + (qchat / 10) * 0.35 + ((cars - 15) / 45) * 0.25
+    prediction = 'YES' if risk_score >= 0.5 else 'NO'
+    confidence = round(risk_score * 100 if prediction == 'YES' else (1 - risk_score) * 100, 1)
+    xai_items = [
+        {'feature': 'AQ Total', 'value': aq_total, 'contribution': round((aq_total / 10) * 0.4, 4), 'direction': 'increase'},
+        {'feature': 'Qchat_10_Score', 'value': qchat, 'contribution': round((qchat / 10) * 0.35, 4), 'direction': 'increase'},
+        {'feature': 'Childhood Autism Rating Scale', 'value': cars, 'contribution': round(((cars - 15) / 45) * 0.25, 4), 'direction': 'increase'},
+    ]
+    return prediction, confidence, xai_items
 
 
 # ─── AUTHENTICATION VIEWS ─────────────────────────────────────────────────────
@@ -294,6 +567,22 @@ def dashboard(request):
             charts['model_comparison'] = _chart_model_comparison()
             charts['feature_importance'] = _chart_feature_importance()
 
+            pipeline = get_pipeline()
+            if pipeline is not None:
+                charts['shap_summary'] = _chart_shap_summary(df, pipeline)
+                charts['shap_beeswarm'] = _chart_shap_beeswarm(df, pipeline)
+                charts['pdp_age'] = _chart_pdp_age(df, pipeline)
+
+                if 'shap_summary' in charts and charts['shap_summary']:
+                    try:
+                        sample_row = df.head(1).copy()
+                        fnames = list(getattr(pipeline, 'feature_names_in_', []))
+                        if fnames and all(c in sample_row.columns for c in fnames):
+                            local_items = _xai_local_explanation(pipeline, sample_row[fnames])
+                            charts['shap_waterfall'] = _chart_local_contrib(local_items, 'SHAP Waterfall-style Local Explanation')
+                    except Exception as e:
+                        logger.warning(f"Waterfall chart generation failed: {e}")
+
             stats = {
                 'total': len(df),
                 'asd_yes': int((df['ASD_traits'] == 'YES').sum()) if 'ASD_traits' in df.columns else 'N/A',
@@ -339,50 +628,11 @@ def predict_api(request):
     pipeline = get_pipeline()
 
     if pipeline is None:
-        # Fallback heuristic when model not yet trained
-        aq_total = sum(int(data[f'a{i}_score']) for i in range(1, 11))
-        qchat = int(data['qchat_10_score'])
-        cars = float(data['childhood_autism_rating_scale'])
-        risk_score = (aq_total / 10) * 0.4 + (qchat / 10) * 0.35 + ((cars - 15) / 45) * 0.25
-        prediction = 'YES' if risk_score >= 0.5 else 'NO'
-        confidence = round(risk_score * 100 if prediction == 'YES' else (1 - risk_score) * 100, 1)
+        prediction, confidence, xai_items = _demo_prediction_from_form(data)
         note = 'demo'
     else:
         try:
-            # Build feature vector matching training columns
-            input_dict = {
-                'A1': int(data['a1_score']),
-                'A2': int(data['a2_score']),
-                'A3': int(data['a3_score']),
-                'A4': int(data['a4_score']),
-                'A5': int(data['a5_score']),
-                'A6': int(data['a6_score']),
-                'A7': int(data['a7_score']),
-                'A8': int(data['a8_score']),
-                'A9': int(data['a9_score']),
-                'A10': int(data['a10_score']),
-                'A10_Autism_Spectrum_Quotient': int(data['a10_score']),
-                'Age_Mons': float(data['age']) * 12,
-                'Age_Years': float(data['age']),
-                'Qchat-10-Score': int(data['qchat_10_score']),
-                'Qchat_10_Score': int(data['qchat_10_score']),
-                'Social_Responsiveness_Scale': float(data.get('social_responsiveness_scale') or 0),
-                'Sex': 1 if data['sex'] == 'm' else 0,
-                'Ethnicity': data['ethnicity'],
-                'Jaundice': 1 if data['jaundice'] == '1' else 0,
-                'Family_mem_with_ASD': 1 if data['family_mem_with_asd'] == '1' else 0,
-                'Speech Delay/Language Disorder': 1 if data['speech_delay'] == '1' else 0,
-                'Learning disorder': 1 if data['learning_disorder'] == '1' else 0,
-                'Genetic_Disorders': 1 if data['genetic_disorders'] == '1' else 0,
-                'Depression': 1 if data['depression'] == '1' else 0,
-                'Global developmental delay/intellectual disability': 1 if data['global_developmental_delay'] == '1' else 0,
-                'Social/Behavioural Issues': 1 if data['social_behavioural_issues'] == '1' else 0,
-                'Childhood Autism Rating Scale (CARS)': float(data['childhood_autism_rating_scale']),
-                'Childhood Autism Rating Scale': float(data['childhood_autism_rating_scale']),
-                'Anxiety disorder': 1 if data['anxiety_disorder'] == '1' else 0,
-                'Anxiety_disorder': 1 if data['anxiety_disorder'] == '1' else 0,
-            }
-            input_df = pd.DataFrame([input_dict])
+            input_df = _pipeline_feature_row(data)
             pred = pipeline.predict(input_df)[0]
             prediction = 'YES' if pred == 1 or str(pred).upper() == 'YES' else 'NO'
             if hasattr(pipeline, 'predict_proba'):
@@ -391,9 +641,11 @@ def predict_api(request):
             else:
                 confidence = None
             note = 'model'
+            xai_items = _xai_local_explanation(pipeline, input_df)
         except Exception as e:
             logger.error(f"Prediction error: {e}")
-            return JsonResponse({'error': f'Prediction failed: {str(e)}'}, status=500)
+            prediction, confidence, xai_items = _demo_prediction_from_form(data)
+            note = 'demo'
 
     # Save to DB
     try:
@@ -429,20 +681,20 @@ def predict_api(request):
     except Exception as e:
         logger.warning(f"DB save failed: {e}")
 
+    top3 = xai_items[:3]
+    top3_names = [t['feature'] for t in top3]
+    explanation_text = f"The top 3 contributing factors were: {', '.join(top3_names)}."
+    contrib_chart = _chart_local_contrib(xai_items)
+
     return JsonResponse({
         'prediction': prediction,
         'confidence': confidence,
         'note': note,
+        'top_factors': top3,
+        'explanation_text': explanation_text,
+        'contrib_chart': contrib_chart,
     })
 
-
-def history(request):
-    """Prediction history page."""
-    if not request.user.is_authenticated:
-        return redirect('auth:login')
-    
-    records = request.user.predictions.all()[:50]
-    return render(request, 'ml_app/history.html', {'records': records})
 
 from django.conf import settings
 import os
