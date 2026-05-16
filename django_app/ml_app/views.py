@@ -383,7 +383,7 @@ def login_view(request):
 def logout_view(request):
     """User logout."""
     logout(request)
-    return redirect('auth:home')
+    return redirect('ml_app:home')
 
 
 # ─── Chart generators ─────────────────────────────────────────────────────────

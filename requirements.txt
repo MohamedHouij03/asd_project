@@ -10,3 +10,6 @@ jupyter==1.0.0
 notebook==7.0.6
 ipykernel==6.27.1
 whitenoise==6.6.0
+shap==0.46.0
+lime==0.2.0.1
+scipy==1.11.4

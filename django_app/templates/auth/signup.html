@@ -3,11 +3,41 @@
 
 {% block title %}Sign Up - Mindello{% endblock %}
 
+{% block extra_head %}
+<style>
+  .auth-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    color: var(--text-primary);
+  }
+  .auth-card .form-control,
+  .auth-card .form-select {
+    background: var(--bg-elevated) !important;
+    color: var(--text-primary) !important;
+    border: 1px solid var(--border) !important;
+  }
+  .auth-card .form-control::placeholder {
+    color: var(--text-muted);
+    opacity: 1;
+  }
+  .auth-card .form-check-label,
+  .auth-card .form-label,
+  .auth-card .text-muted,
+  .auth-card small {
+    color: var(--text-muted) !important;
+  }
+  .auth-card .form-check-label strong,
+  .auth-card h4 {
+    color: var(--text-primary);
+  }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-5">
     <div class="row justify-content-center">
         <div class="col-lg-6 col-md-8">
-            <div class="card shadow-lg border-0">
+            <div class="card shadow-lg auth-card">
                 <div class="card-body p-5">
                     <div class="text-center mb-4">
                         <h2 class="mb-2" style="color: #059669; font-weight: 700;">Mindello</h2>
