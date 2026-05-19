@@ -10,11 +10,11 @@
       document.documentElement.setAttribute('data-theme', theme);
     })();
   </script>
-  <title>{% block title %}Mindello · AI-Powered ASD Screening{% endblock %}</title>
+  <title>{% block title %}Mindello · Early Autism Screening Support{% endblock %}</title>
 
   <!-- Google Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
 
   <!-- Bootstrap 5 -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -52,9 +52,9 @@
       --info-tip-text: #5b21b6;
       --section-soft-bg: rgba(37,99,235,0.06);
       --shadow-card: rgba(15,23,42,0.12);
-      --font-mono: 'Space Mono', monospace;
-      --font-body: 'DM Sans', sans-serif;
-      --font-display: 'DM Serif Display', serif;
+      --font-mono: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-body: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+      --font-display: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
       --sidebar-w: 240px;
     }
 
@@ -92,6 +92,10 @@
 
     *, *::before, *::after { box-sizing: border-box; }
 
+    html {
+      font-family: var(--font-body);
+    }
+
     body {
       background: var(--bg-base);
       color: var(--text-primary);
@@ -99,6 +103,11 @@
       font-size: 15px;
       line-height: 1.6;
       min-height: 100vh;
+    }
+
+    h1, h2, h3, h4, h5, h6,
+    .btn, .form-control, .form-select, .dropdown-menu {
+      font-family: var(--font-body);
     }
 
     /* ── SCROLLBAR ── */
@@ -118,22 +127,11 @@
       z-index: 1000;
     }
     .navbar-brand {
-      font-family: var(--font-mono);
-      font-size: 1rem;
-      color: var(--accent) !important;
-      letter-spacing: -0.03em;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    .brand-icon {
-      width: 28px; height: 28px;
-      background: linear-gradient(135deg, #4ade80, #60a5fa);
-      border-radius: 6px;
-      display: flex; align-items: center; justify-content: center;
-      font-size: 14px;
-      color: var(--brand-icon-text);
+      font-family: var(--font-body);
+      font-size: 1.25rem;
       font-weight: 700;
+      color: var(--accent) !important;
+      letter-spacing: -0.02em;
     }
     .nav-link {
       color: var(--text-muted) !important;
@@ -259,10 +257,10 @@
 
     /* ── BUTTONS ── */
     .btn-primary-glow {
-      background: linear-gradient(135deg, #4ade80, #22d3ee);
-      color: var(--btn-primary-text);
-      font-weight: 700;
-      font-family: var(--font-mono);
+      background: #059669;
+      color: #fff;
+      font-weight: 600;
+      font-family: var(--font-body);
       font-size: 0.85rem;
       border: none;
       border-radius: 8px;
@@ -273,7 +271,9 @@
     }
     .btn-primary-glow:hover {
       transform: translateY(-1px);
-      box-shadow: 0 6px 24px rgba(74,222,128,0.3);
+      background: #047857;
+      box-shadow: 0 6px 20px rgba(5,150,105,0.25);
+      color: #fff;
     }
     .btn-outline-glow {
       background: transparent;
@@ -297,9 +297,10 @@
     /* ── SECTION TITLES ── */
     .section-title {
       font-family: var(--font-display);
-      font-size: 1.6rem;
+      font-size: clamp(1.5rem, 3vw, 1.85rem);
       color: var(--text-primary);
       margin-bottom: 0.3rem;
+      line-height: 1.25;
     }
     .section-sub {
       font-size: 0.88rem;
@@ -312,6 +313,14 @@
       letter-spacing: 0.1em;
       text-transform: uppercase;
       margin-bottom: 0.4rem;
+    }
+    .section-eyebrow {
+      font-size: 0.8rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      color: var(--accent);
+      text-transform: uppercase;
+      margin-bottom: 0.5rem;
     }
 
     /* ── CHART IMAGE ── */
@@ -458,10 +467,7 @@
 <!-- ══ NAVBAR ══ -->
 <nav class="navbar navbar-expand-lg">
   <div class="container-fluid">
-    <a class="navbar-brand" href="{% url 'ml_app:home' %}">
-      <div class="brand-icon">🧠</div>
-      <strong>Mindello</strong>
-    </a>
+    <a class="navbar-brand" href="{% url 'ml_app:home' %}">Mindello</a>
     <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navmenu"
       style="color:var(--text-muted);">
       <i class="bi bi-list" style="font-size:1.3rem;"></i>
@@ -476,12 +482,12 @@
           </li>
           <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" href="{% url 'ml_app:dashboard' %}">
-              <i class="bi bi-grid-3x3-gap me-1"></i>Dashboard
+              <i class="bi bi-grid-3x3-gap me-1"></i>Overview
             </a>
           </li>
           <li class="nav-item">
             <a class="nav-link {% if request.resolver_match.url_name == 'predict' %}active{% endif %}" href="{% url 'ml_app:predict' %}">
-              <i class="bi bi-cpu me-1"></i>Predict
+              <i class="bi bi-clipboard2-pulse me-1"></i>Screening
             </a>
           </li>
           <li class="nav-item">
@@ -542,11 +548,11 @@
   <div>
     <span class="glow-dot glow-dot-green"></span>
     <span style="font-family:var(--font-mono);font-size:0.75rem;color:var(--text-dim);">Mindello v2.0</span>
-    &nbsp;·&nbsp; AI-Powered ASD Screening — Research & Education Only
+    &nbsp;·&nbsp; Early screening support — not a medical diagnosis
   </div>
   <div style="font-size:0.75rem;">
     <a href="{% url 'ml_app:about' %}">About</a> &middot;
-    <span style="color:var(--text-dim);">© 2024 Mindello</span>
+    <span style="color:var(--text-dim);">© 2026 Mindello</span>
   </div>
 </footer>
 

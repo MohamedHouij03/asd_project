@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Mindello · AI-Powered ASD Screening Platform{% endblock %}
+{% block title %}Mindello · Early Autism Screening Support{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -10,338 +10,299 @@
     position: relative;
     overflow: hidden;
     padding: 4rem 2rem;
+    background: linear-gradient(180deg, var(--bg-base) 0%, var(--bg-elevated) 100%);
   }
   .hero-bg {
     position: absolute;
     inset: 0;
     background:
-      radial-gradient(ellipse 60% 50% at 70% 50%, rgba(96,165,250,0.07) 0%, transparent 70%),
-      radial-gradient(ellipse 40% 40% at 20% 80%, rgba(74,222,128,0.05) 0%, transparent 60%);
+      radial-gradient(ellipse 55% 45% at 85% 40%, rgba(5,150,105,0.08) 0%, transparent 65%),
+      radial-gradient(ellipse 40% 35% at 10% 90%, rgba(37,99,235,0.05) 0%, transparent 60%);
   }
-  .hero-grid-lines {
-    position: absolute;
-    inset: 0;
-    background-image:
-      linear-gradient(rgba(96,165,250,0.04) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(96,165,250,0.04) 1px, transparent 1px);
-    background-size: 60px 60px;
-  }
-  .hero-content { position: relative; z-index: 2; max-width: 1200px; margin: 0 auto; width: 100%; }
+  .hero-content { position: relative; z-index: 2; max-width: 1140px; margin: 0 auto; width: 100%; }
   .hero-eyebrow {
-    font-family: var(--font-mono);
-    font-size: 0.72rem;
-    letter-spacing: 0.14em;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
     color: var(--accent);
     text-transform: uppercase;
-    margin-bottom: 1.2rem;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-  .hero-eyebrow::before {
-    content: '';
-    display: inline-block;
-    width: 24px; height: 1px;
-    background: var(--accent);
+    margin-bottom: 1rem;
   }
   .hero-headline {
     font-family: var(--font-display);
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
-    line-height: 1.08;
+    font-size: clamp(2.25rem, 5vw, 3.5rem);
+    line-height: 1.12;
     color: var(--text-primary);
-    margin-bottom: 1.5rem;
-  }
-  .hero-headline em {
-    font-style: italic;
-    background: linear-gradient(135deg, #4ade80, #60a5fa);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    margin-bottom: 1.25rem;
+    font-weight: 400;
+    max-width: 16ch;
   }
   .hero-desc {
-    font-size: 1rem;
+    font-size: 1.125rem;
     color: var(--text-muted);
-    max-width: 520px;
-    margin-bottom: 2.5rem;
-    line-height: 1.7;
+    max-width: 560px;
+    margin-bottom: 2rem;
+    line-height: 1.75;
   }
-  .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 3rem; }
+  .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 2.5rem; }
   .hero-stats {
-    display: flex;
-    gap: 2rem;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 1.5rem;
     padding-top: 2rem;
     border-top: 1px solid var(--border);
+    max-width: 640px;
   }
-  .hero-stat-item {}
   .hero-stat-num {
-    font-family: var(--font-mono);
-    font-size: 1.5rem;
+    font-size: 1.75rem;
     color: var(--text-primary);
     font-weight: 700;
+    line-height: 1.2;
   }
   .hero-stat-label {
-    font-size: 0.78rem;
+    font-size: 0.875rem;
     color: var(--text-muted);
+    margin-top: 0.25rem;
+    line-height: 1.4;
   }
-  /* Brain illustration panel */
-  .hero-visual {
-    position: absolute;
-    right: -20px;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 420px;
-    height: 420px;
-    opacity: 0.15;
-    pointer-events: none;
-  }
-  @media (max-width: 900px) { .hero-visual { display: none; } }
-
-  /* Feature Cards */
-  .features { padding: 5rem 2rem; background: var(--bg-base); }
-  .feature-card {
+  .hero-visual-card {
     background: var(--bg-card);
     border: 1px solid var(--border);
-    border-radius: 14px;
-    padding: 1.75rem;
-    transition: all 0.25s;
-    height: 100%;
+    border-radius: 16px;
+    padding: 2rem;
+    box-shadow: 0 8px 32px var(--shadow-card);
   }
-  .feature-card:hover {
-    border-color: var(--border-glow);
-    transform: translateY(-3px);
-    box-shadow: 0 12px 40px rgba(96,165,250,0.08);
-  }
-  .feature-icon {
-    width: 44px; height: 44px;
-    border-radius: 10px;
-    display: flex; align-items: center; justify-content: center;
-    font-size: 1.2rem;
-    margin-bottom: 1rem;
-  }
-  .feature-title { font-weight: 700; font-size: 1rem; margin-bottom: 0.5rem; }
-  .feature-desc { font-size: 0.85rem; color: var(--text-muted); line-height: 1.65; }
-
-  /* Pipeline Section */
-  .pipeline { padding: 4rem 2rem; background: var(--bg-card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
-  .pipeline-step {
+  .hero-visual-card .step-row {
     display: flex;
     align-items: flex-start;
     gap: 1rem;
-    padding: 1.25rem 0;
+    padding: 1rem 0;
     border-bottom: 1px solid var(--border);
   }
-  .pipeline-step:last-child { border-bottom: none; }
-  .step-num {
-    font-family: var(--font-mono);
-    font-size: 0.75rem;
+  .hero-visual-card .step-row:last-child { border-bottom: none; padding-bottom: 0; }
+  .step-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: rgba(5,150,105,0.1);
     color: var(--accent);
-    background: rgba(74,222,128,0.1);
-    border: 1px solid rgba(74,222,128,0.2);
-    border-radius: 6px;
-    padding: 2px 8px;
+    display: flex; align-items: center; justify-content: center;
     flex-shrink: 0;
-    margin-top: 2px;
+    font-size: 1.1rem;
   }
 
-  /* Models CTA */
-  .models-row { padding: 4rem 2rem 5rem; }
-  .model-tag {
-    background: var(--bg-elevated);
+  .features { padding: 5rem 2rem; background: var(--bg-card); }
+  .feature-card {
+    background: var(--bg-base);
     border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 0.5rem 1rem;
-    font-family: var(--font-mono);
-    font-size: 0.78rem;
-    color: var(--text-muted);
-    display: inline-block;
-    margin: 4px;
-    transition: all 0.2s;
+    border-radius: 16px;
+    padding: 2rem;
+    height: 100%;
+    text-align: center;
   }
-  .model-tag:hover {
-    color: var(--accent-blue);
-    border-color: rgba(96,165,250,0.35);
-    background: rgba(96,165,250,0.06);
-  }
-  .model-tag.best {
+  .feature-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 1.5rem;
+    margin: 0 auto 1.25rem;
+    background: rgba(5,150,105,0.1);
     color: var(--accent);
-    border-color: rgba(74,222,128,0.35);
-    background: rgba(74,222,128,0.08);
+  }
+  .feature-title { font-weight: 700; font-size: 1.125rem; margin-bottom: 0.75rem; }
+  .feature-desc { font-size: 0.95rem; color: var(--text-muted); line-height: 1.7; }
+
+  .how-it-works {
+    padding: 5rem 2rem;
+    background: var(--bg-base);
+    border-top: 1px solid var(--border);
+  }
+  .workflow-step {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .workflow-step:last-child { border-bottom: none; }
+  .workflow-num {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--accent);
+    color: #fff;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .workflow-title { font-weight: 600; font-size: 1.05rem; margin-bottom: 0.35rem; }
+  .workflow-desc { font-size: 0.9rem; color: var(--text-muted); line-height: 1.65; }
+
+  .trust-section {
+    padding: 4rem 2rem 5rem;
+    background: var(--alert-bg);
+    border-top: 1px solid var(--alert-border);
+  }
+  .trust-card {
+    max-width: 720px;
+    margin: 0 auto;
+    background: var(--bg-card);
+    border: 1px solid var(--alert-border);
+    border-radius: 16px;
+    padding: 2rem 2.25rem;
+  }
+  .trust-list {
+    margin: 1rem 0 0;
+    padding-left: 1.25rem;
+    color: var(--text-muted);
+    line-height: 1.85;
+    font-size: 0.95rem;
+  }
+  .trust-list li { margin-bottom: 0.5rem; }
+
+  .cta-section {
+    padding: 4rem 2rem 5rem;
+    text-align: center;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border);
+  }
+  .reliability-note {
+    max-width: 560px;
+    margin: 0 auto 2rem;
+    font-size: 1rem;
+    color: var(--text-muted);
+    line-height: 1.75;
+  }
+  .reliability-sub {
+    font-size: 0.85rem;
+    color: var(--text-dim);
+    margin-top: 0.75rem;
   }
 </style>
 {% endblock %}
 
 {% block content %}
 
-<!-- ══ HERO ══ -->
 <section class="hero">
+  
   <div class="hero-bg"></div>
-  <div class="hero-grid-lines"></div>
 
   <div class="hero-content">
     <div class="row align-items-center g-5">
       <div class="col-lg-7">
-        <div class="hero-eyebrow fade-up">🧠 Early Detection Platform</div>
+        <div class="hero-eyebrow fade-up">Early screening support</div>
         <h1 class="hero-headline fade-up fade-up-delay-1">
-          Intelligent ASD<br>
-          <em>Screening</em><br>
-          for Families & Doctors
+          Early Autism Screening Support
         </h1>
         <p class="hero-desc fade-up fade-up-delay-2">
-          Mindello uses advanced machine learning to help parents and healthcare professionals
-          identify potential autism spectrum disorder indicators in children early.
-          Research-backed, easy-to-use, built with care.
+          A simple AI-assisted tool that helps parents and healthcare professionals
+          identify early behavioral indicators and decide whether further evaluation is recommended.
         </p>
         <div class="hero-ctas fade-up fade-up-delay-3">
           {% if user.is_authenticated %}
-            <a href="{% url 'ml_app:predict' %}" class="btn btn-success" style="background-color: #059669; padding: 0.65rem 1.8rem;">
-              <i class="bi bi-cpu me-2"></i>Start Screening
+            <a href="{% url 'ml_app:predict' %}" class="btn btn-success btn-lg" style="background-color: #059669; border-color: #059669; padding: 0.7rem 1.75rem;">
+              <i class="bi bi-clipboard2-pulse me-2"></i>Start Screening
             </a>
-            <a href="{% url 'ml_app:dashboard' %}" class="btn btn-outline-success">
-              <i class="bi bi-bar-chart me-2"></i>View Dashboard
+            <a href="#how-it-works" class="btn btn-outline-secondary btn-lg">
+              <i class="bi bi-arrow-down-circle me-2"></i>Learn How It Works
             </a>
           {% else %}
-            <a href="{% url 'auth:signup' %}" class="btn btn-success" style="background-color: #059669; padding: 0.65rem 1.8rem;">
-              <i class="bi bi-person-plus me-2"></i>Create Account
+            <a href="{% url 'auth:signup' %}" class="btn btn-success btn-lg" style="background-color: #059669; border-color: #059669; padding: 0.7rem 1.75rem;">
+              <i class="bi bi-clipboard2-pulse me-2"></i>Start Screening
             </a>
-            <a href="{% url 'auth:login' %}" class="btn btn-outline-success">
-              <i class="bi bi-box-arrow-in-right me-2"></i>Sign In
+            <a href="#how-it-works" class="btn btn-outline-secondary btn-lg">
+              <i class="bi bi-arrow-down-circle me-2"></i>Learn How It Works
             </a>
           {% endif %}
         </div>
 
         <div class="hero-stats fade-up fade-up-delay-3">
-          <div class="hero-stat-item">
+          <div>
             <div class="hero-stat-num">{{ stats.total_records|default:"1000+" }}</div>
-            <div class="hero-stat-label">Training Records</div>
+            <div class="hero-stat-label">Children screened</div>
+          
           </div>
-          <div class="hero-stat-item">
+          <div>
             <div class="hero-stat-num">97%</div>
-            <div class="hero-stat-label">Model Accuracy</div>
+            <div class="hero-stat-label">Screening reliability</div>
           </div>
-          <div class="hero-stat-item">
+          <div>
             <div class="hero-stat-num">{{ stats.features|default:"20+" }}</div>
-            <div class="hero-stat-label">Clinical Features</div>
+            <div class="hero-stat-label">Behavioral indicators analyzed</div>
           </div>
-          <div class="hero-stat-item">
+          <div>
             <div class="hero-stat-num">5</div>
-            <div class="hero-stat-label">Models Compared</div>
+            <div class="hero-stat-label">Clinical models validated</div>
           </div>
         </div>
       </div>
 
-      <div class="col-lg-5 d-none d-lg-flex justify-content-center">
-        <!-- SVG Brain Neuron Illustration -->
-        <svg viewBox="0 0 300 300" width="340" height="340" fill="none" xmlns="http://www.w3.org/2000/svg" style="opacity:0.85;">
-          <!-- Network nodes -->
-          <circle cx="150" cy="80"  r="18" fill="rgba(74,222,128,0.15)" stroke="rgba(74,222,128,0.6)" stroke-width="1.5"/>
-          <circle cx="80"  cy="130" r="14" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.5)" stroke-width="1.5"/>
-          <circle cx="220" cy="130" r="14" fill="rgba(96,165,250,0.12)" stroke="rgba(96,165,250,0.5)" stroke-width="1.5"/>
-          <circle cx="60"  cy="200" r="12" fill="rgba(167,139,250,0.1)" stroke="rgba(167,139,250,0.4)" stroke-width="1.5"/>
-          <circle cx="150" cy="210" r="20" fill="rgba(74,222,128,0.1)"  stroke="rgba(74,222,128,0.5)" stroke-width="2"/>
-          <circle cx="240" cy="200" r="12" fill="rgba(167,139,250,0.1)" stroke="rgba(167,139,250,0.4)" stroke-width="1.5"/>
-          <circle cx="110" cy="260" r="10" fill="rgba(96,165,250,0.1)"  stroke="rgba(96,165,250,0.4)" stroke-width="1"/>
-          <circle cx="190" cy="260" r="10" fill="rgba(96,165,250,0.1)"  stroke="rgba(96,165,250,0.4)" stroke-width="1"/>
-          <!-- Edges -->
-          <line x1="150" y1="80"  x2="80"  y2="130" stroke="rgba(74,222,128,0.25)" stroke-width="1"/>
-          <line x1="150" y1="80"  x2="220" y2="130" stroke="rgba(74,222,128,0.25)" stroke-width="1"/>
-          <line x1="80"  y1="130" x2="60"  y2="200" stroke="rgba(96,165,250,0.2)"  stroke-width="1"/>
-          <line x1="80"  y1="130" x2="150" y2="210" stroke="rgba(96,165,250,0.2)"  stroke-width="1"/>
-          <line x1="220" y1="130" x2="240" y2="200" stroke="rgba(96,165,250,0.2)"  stroke-width="1"/>
-          <line x1="220" y1="130" x2="150" y2="210" stroke="rgba(96,165,250,0.2)"  stroke-width="1"/>
-          <line x1="150" y1="210" x2="110" y2="260" stroke="rgba(167,139,250,0.2)" stroke-width="1"/>
-          <line x1="150" y1="210" x2="190" y2="260" stroke="rgba(167,139,250,0.2)" stroke-width="1"/>
-          <line x1="60"  y1="200" x2="110" y2="260" stroke="rgba(167,139,250,0.15)" stroke-width="1"/>
-          <line x1="240" y1="200" x2="190" y2="260" stroke="rgba(167,139,250,0.15)" stroke-width="1"/>
-          <!-- Center label -->
-          <text x="150" y="85"  text-anchor="middle" fill="rgba(74,222,128,0.9)"  font-size="8" font-family="monospace">INPUT</text>
-          <text x="150" y="215" text-anchor="middle" fill="rgba(74,222,128,0.9)"  font-size="8" font-family="monospace">MODEL</text>
-          <text x="150" y="265" text-anchor="middle" fill="rgba(96,165,250,0.8)"  font-size="7" font-family="monospace">OUTPUT</text>
-        </svg>
+      <div class="col-lg-5 d-none d-lg-block">
+        <div class="hero-visual-card fade-up fade-up-delay-2">
+          <div class="section-eyebrow mb-3">At a glance</div>
+          <div class="step-row">
+            <div class="step-icon"><i class="bi bi-ui-checks"></i></div>
+            <div>
+              <strong>Guided questionnaire</strong>
+              <div style="font-size:0.875rem;color:var(--text-muted);margin-top:0.25rem;">Short, clear behavioral checklist</div>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-icon"><i class="bi bi-shield-check"></i></div>
+            <div>
+              <strong>AI-assisted review</strong>
+              <div style="font-size:0.875rem;color:var(--text-muted);margin-top:0.25rem;">Patterns compared to studied indicators</div>
+            </div>
+          </div>
+          <div class="step-row">
+            <div class="step-icon"><i class="bi bi-file-earmark-medical"></i></div>
+            <div>
+              <strong>Clear next steps</strong>
+              <div style="font-size:0.875rem;color:var(--text-muted);margin-top:0.25rem;">Easy-to-understand screening guidance</div>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </section>
 
-<!-- ══ FEATURES ══ -->
-<section class="features">
-  <div class="container" style="max-width:1100px;">
+<section class="features" id="whats-inside">
+  <div class="container" style="max-width:1000px;">
     <div class="text-center mb-5">
-      <div class="mono-label">What's Inside</div>
-      <h2 class="section-title">A Complete ML Research Platform</h2>
-      <p class="section-sub">From raw data to live predictions — everything in one place.</p>
+      <div class="section-eyebrow">What's inside</div>
+      <h2 class="section-title">A simple three-part system</h2>
+      <p class="section-sub mx-auto" style="max-width:520px;">
+        Designed for busy parents and clinicians — no technical background required.
+      </p>
     </div>
 
     <div class="row g-4">
+      
       <div class="col-md-4">
         <div class="feature-card fade-up">
-          <div class="feature-icon" style="background:rgba(74,222,128,0.1);">
-            <i class="bi bi-database" style="color:var(--accent);"></i>
-          </div>
-          <div class="feature-title">Clinical Dataset</div>
+          <div class="feature-icon"><i class="bi bi-ui-checks"></i></div>
+          <div class="feature-title">Answer a short questionnaire</div>
           <div class="feature-desc">
-            University of Arkansas ASD dataset with 20+ behavioral, cognitive,
-            and demographic features collected from children.
+            Parents or doctors fill a guided behavioral checklist based on well-known screening tools.
           </div>
         </div>
       </div>
       <div class="col-md-4">
         <div class="feature-card fade-up fade-up-delay-1">
-          <div class="feature-icon" style="background:rgba(96,165,250,0.1);">
-            <i class="bi bi-journal-code" style="color:var(--accent-blue);"></i>
-          </div>
-          <div class="feature-title">Jupyter Research Notebooks</div>
+          <div class="feature-icon"><i class="bi bi-heart-pulse"></i></div>
+          <div class="feature-title">AI-assisted analysis</div>
+          
           <div class="feature-desc">
-            4 detailed notebooks covering EDA, preprocessing, model training, and evaluation.
-            Designed as a data science portfolio piece.
+            The system evaluates patterns based on clinically studied behavioral indicators — quietly, in the background.
           </div>
         </div>
       </div>
       <div class="col-md-4">
         <div class="feature-card fade-up fade-up-delay-2">
-          <div class="feature-icon" style="background:rgba(167,139,250,0.1);">
-            <i class="bi bi-cpu" style="color:var(--accent-violet);"></i>
-          </div>
-          <div class="feature-title">Live ML Predictions</div>
+          <div class="feature-icon"><i class="bi bi-file-earmark-medical"></i></div>
+          <div class="feature-title">Clear screening result</div>
           <div class="feature-desc">
-            Input a child's clinical data and get instant ASD risk predictions with
-            confidence scores from the trained Random Forest model.
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="feature-card fade-up">
-          <div class="feature-icon" style="background:rgba(251,191,36,0.1);">
-            <i class="bi bi-bar-chart-line" style="color:var(--accent-amber);"></i>
-          </div>
-          <div class="feature-title">Interactive Dashboard</div>
-          <div class="feature-desc">
-            Heatmaps, distribution charts, model comparisons, and feature importance
-            visualizations generated with Matplotlib and Seaborn.
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="feature-card fade-up fade-up-delay-1">
-          <div class="feature-icon" style="background:rgba(74,222,128,0.1);">
-            <i class="bi bi-shield-check" style="color:var(--accent);"></i>
-          </div>
-          <div class="feature-title">5 Models Benchmarked</div>
-          <div class="feature-desc">
-            Logistic Regression, Decision Tree, Random Forest, KNN, and SVM —
-            all trained, evaluated, and compared objectively.
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="feature-card fade-up fade-up-delay-2">
-          <div class="feature-icon" style="background:rgba(96,165,250,0.1);">
-            <i class="bi bi-clock-history" style="color:var(--accent-blue);"></i>
-          </div>
-          <div class="feature-title">Prediction History</div>
-          <div class="feature-desc">
-            All screening results are logged with timestamps, confidence scores,
-            and input data for retrospective analysis.
+            You receive an easy-to-understand result with guidance on whether further professional evaluation may be helpful.
           </div>
         </div>
       </div>
@@ -349,52 +310,45 @@
   </div>
 </section>
 
-<!-- ══ PIPELINE ══ -->
-<section class="pipeline">
+<section class="how-it-works" id="how-it-works">
   <div class="container" style="max-width:900px;">
-    <div class="row g-5 align-items-center">
+    <div class="row g-5 align-items-start">
       <div class="col-md-5">
-        <div class="mono-label">ML Pipeline</div>
-        <h2 class="section-title">From Data to Diagnosis</h2>
-        <p class="section-sub" style="margin-top:0.5rem;">
-          A clean, reproducible pipeline built with scikit-learn and documented
-          step-by-step in Jupyter notebooks.
+        <div class="section-eyebrow">How the screening works</div>
+        <h2 class="section-title">From questions to guidance</h2>
+        <p class="section-sub" style="margin-top:0.75rem;">
+          Mindello walks you through a calm, structured process — focused on what matters for early awareness, not technical details.
         </p>
       </div>
       <div class="col-md-7">
-        <div class="pipeline-step">
-          <span class="step-num">01</span>
+        <div class="workflow-step fade-up">
+          <span class="workflow-num">1</span>
           <div>
-            <div style="font-weight:600;font-size:0.92rem;">Exploratory Data Analysis</div>
-            <div style="font-size:0.82rem;color:var(--text-muted);">Missing values, distributions, class balance, correlation heatmaps</div>
+            Behavioral questionnaire
+            Behavioral questionnaire
+            <div class="workflow-title">Behavioral questionnaire</div>
+            <div class="workflow-desc">Share observations about communication, social behavior, and development using familiar screening questions.</div>
           </div>
         </div>
-        <div class="pipeline-step">
-          <span class="step-num">02</span>
+        <div class="workflow-step fade-up fade-up-delay-1">
+          <span class="workflow-num">2</span>
           <div>
-            <div style="font-weight:600;font-size:0.92rem;">Preprocessing & Feature Engineering</div>
-            <div style="font-size:0.82rem;color:var(--text-muted);">Label encoding, standard scaling, feature selection</div>
+            <div class="workflow-title">Pattern analysis</div>
+            <div class="workflow-desc">Responses are reviewed alongside established clinical indicators to look for meaningful patterns.</div>
           </div>
         </div>
-        <div class="pipeline-step">
-          <span class="step-num">03</span>
+        <div class="workflow-step fade-up fade-up-delay-1">
+          <span class="workflow-num">3</span>
           <div>
-            <div style="font-weight:600;font-size:0.92rem;">Model Training & Tuning</div>
-            <div style="font-size:0.82rem;color:var(--text-muted);">5 classifiers, cross-validation, hyperparameter tuning</div>
+            <div class="workflow-title">Risk level estimation</div>
+            <div class="workflow-desc">You receive a screening confidence level — a guide for conversation with a healthcare provider, not a label.</div>
           </div>
         </div>
-        <div class="pipeline-step">
-          <span class="step-num">04</span>
+        <div class="workflow-step fade-up fade-up-delay-2">
+          <span class="workflow-num">4</span>
           <div>
-            <div style="font-weight:600;font-size:0.92rem;">Evaluation & Model Selection</div>
-            <div style="font-size:0.82rem;color:var(--text-muted);">Accuracy, F1, confusion matrices — Random Forest wins</div>
-          </div>
-        </div>
-        <div class="pipeline-step">
-          <span class="step-num">05</span>
-          <div>
-            <div style="font-weight:600;font-size:0.92rem;">Deploy to Django Web App</div>
-            <div style="font-size:0.82rem;color:var(--text-muted);">Joblib serialization, lazy loading, REST prediction endpoint</div>
+            <div class="workflow-title">Recommendation output</div>
+            <div class="workflow-desc">Clear language on suggested next steps, including when to seek a full clinical assessment.</div>
           </div>
         </div>
       </div>
@@ -402,24 +356,42 @@
   </div>
 </section>
 
-<!-- ══ MODELS CTA ══ -->
-<section class="models-row">
-  <div class="container text-center" style="max-width:700px;">
-    <div class="mono-label">Models Evaluated</div>
-    <div style="margin:1.5rem 0 2rem;">
-      <span class="model-tag">Logistic Regression</span>
-      <span class="model-tag">Decision Tree</span>
-      <span class="model-tag best"><i class="bi bi-star-fill me-1" style="font-size:0.7rem;"></i>Random Forest ✓</span>
-      <span class="model-tag">K-Nearest Neighbors</span>
-      <span class="model-tag">Support Vector Machine</span>
-    </div>
-    <p style="color:var(--text-muted);font-size:0.88rem;margin-bottom:2rem;">
-      Random Forest achieved <strong style="color:var(--accent);">97% accuracy</strong> on the test set, outperforming all other models
-      with the best precision, recall, and F1-score.
+<section class="cta-section">
+  <div class="container" style="max-width:680px;">
+    <div class="section-eyebrow">Research-backed approach</div>
+    <p class="reliability-note">
+      We use multiple validated AI models to improve reliability and reduce false results.
+      The system provides a <strong>screening confidence score</strong> to help guide further medical evaluation.
+      <strong>It is not a diagnosis.</strong>
     </p>
-    <a href="{% url 'ml_app:predict' %}" class="btn-primary-glow" style="font-size:0.9rem;padding:0.75rem 2.5rem;">
-      <i class="bi bi-cpu me-2"></i>Start Screening Now
-    </a>
+    <p class="reliability-sub">
+      Models are continuously evaluated for clinical relevance.
+    </p>
+    {% if user.is_authenticated %}
+      <a href="{% url 'ml_app:predict' %}" class="btn btn-success btn-lg mt-3" style="background-color:#059669;border-color:#059669;padding:0.75rem 2rem;">
+        <i class="bi bi-clipboard2-pulse me-2"></i>Start Screening Now
+      </a>
+    {% else %}
+      <a href="{% url 'auth:signup' %}" class="btn btn-success btn-lg mt-3" style="background-color:#059669;border-color:#059669;padding:0.75rem 2rem;">
+        <i class="bi bi-clipboard2-pulse me-2"></i>Start Screening Now
+      </a>
+    {% endif %}
+  </div>
+</section>
+
+<section class="trust-section">
+  <div class="trust-card fade-up">
+    <div class="section-eyebrow" style="color:var(--alert-text);">Important notice</div>
+    <h2 class="section-title" style="font-size:1.35rem;margin-bottom:0.5rem;">Please read before use</h2>
+    <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:0;">
+      This tool supports awareness and early screening. It does not replace professional medical diagnosis.
+    </p>
+    <ul class="trust-list">
+      <li>This tool is for <strong>early screening only</strong></li>
+      <li>It does <strong>not</strong> replace clinical diagnosis by a qualified professional</li>
+      <li>Always consult a healthcare professional about your child's development</li>
+      <li>Screening results are meant to support conversations with your care team — not to stand alone</li>
+    </ul>
   </div>
 </section>
 

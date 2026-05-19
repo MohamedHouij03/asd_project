@@ -5,7 +5,7 @@ from .models import UserProfile
 
 YES_NO_CHOICES = [("1", "Yes"), ("0", "No")]
 SEX_CHOICES    = [("m", "Male"), ("f", "Female")]
-SCORE_01       = [("0", "0"), ("1", "1")]
+SCORE_01       = [("0", "Never / rarely"), ("1", "Always / usually")]
 SCORE_0_10     = [(str(i), str(i)) for i in range(11)]
 
 ETHNICITY_CHOICES = [
@@ -109,7 +109,14 @@ class PredictionForm(forms.Form):
 
     qchat_10_score = forms.IntegerField(
         min_value=0, max_value=10, label="Q-CHAT-10 Score (0–10)",
-        widget=forms.NumberInput(attrs={"class":"form-control","min":0,"max":10}))
+        widget=forms.NumberInput(attrs={
+            "class": "form-control",
+            "min": 0,
+            "max": 10,
+            "readonly": "readonly",
+            "id": "id_qchat_10_score",
+            "aria-readonly": "true",
+        }))
 
     social_responsiveness_scale = forms.FloatField(
         min_value=0, max_value=10, required=False, label="Social Responsiveness Scale — SRS (0–10)",
@@ -133,3 +140,10 @@ class PredictionForm(forms.Form):
     global_developmental_delay= forms.ChoiceField(choices=YES_NO_CHOICES, label="Global Developmental Delay / Intellectual Disability?", widget=forms.Select(attrs={"class":"form-select"}))
     social_behavioural_issues = forms.ChoiceField(choices=YES_NO_CHOICES, label="Social / Behavioural Issues?", widget=forms.Select(attrs={"class":"form-select"}))
     anxiety_disorder          = forms.ChoiceField(choices=YES_NO_CHOICES, label="Anxiety Disorder?", widget=forms.Select(attrs={"class":"form-select"}))
+
+    def clean(self):
+        cleaned = super().clean()
+        if cleaned:
+            aq_total = sum(int(cleaned[f"a{i}_score"]) for i in range(1, 11))
+            cleaned["qchat_10_score"] = min(10, max(0, aq_total))
+        return cleaned

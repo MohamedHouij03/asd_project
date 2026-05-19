@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}ASD Screening · NeuroScan ASD{% endblock %}
+{% block title %}Screening · Mindello{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -162,6 +162,11 @@
     display: flex;
     gap: 8px;
   }
+  #id_qchat_10_score {
+    background: var(--bg-elevated);
+    cursor: not-allowed;
+    font-weight: 600;
+  }
 </style>
 {% endblock %}
 
@@ -172,18 +177,18 @@
   <div class="spinner-box">
     <div class="spinner-border text-info mb-3" role="status" style="width:2.5rem;height:2.5rem;"></div>
     <div style="font-family:var(--font-mono);font-size:0.85rem;color:var(--text-muted);">
-      Running ML Inference…
+      Preparing your screening result…
     </div>
     <div style="font-size:0.75rem;color:var(--text-dim);margin-top:0.3rem;">
-      Loading model & processing features
+      Reviewing behavioral indicators
     </div>
   </div>
 </div>
 
 <div style="max-width:1100px;margin:0 auto;padding:2rem 1.5rem 0.5rem;">
-  <div class="mono-label">ASD Screening Tool</div>
-  <h1 class="section-title">Clinical Feature Input</h1>
-  <p class="section-sub">Fill in all sections below. The AI model will predict ASD likelihood.</p>
+  <div class="section-eyebrow">Child screening</div>
+  <h1 class="section-title">Behavioral screening questionnaire</h1>
+  <p class="section-sub">Complete each section below. You will receive a screening result with suggested next steps — not a diagnosis.</p>
 </div>
 
 <form id="predictionForm" method="POST">
@@ -199,13 +204,14 @@
         <div class="form-section-icon"><i class="bi bi-question-circle"></i></div>
         <div>
           <div class="form-section-title">AQ-10 Autism Spectrum Quotient</div>
-          <div style="font-size:0.75rem;color:var(--text-muted);">Score 0–10 per question. Total ≥ 6 may indicate autism.</div>
+          Choose how often each behaviour applies. A total of 6 or more may suggest further evaluation.
+          <div style="font-size:0.75rem;color:var(--text-muted);">Choose how often each behaviour applies. A total of 6 or more may suggest further evaluation.</div>
         </div>
       </div>
       <div class="form-section-body">
         <div class="info-tip">
           <i class="bi bi-info-circle-fill" style="flex-shrink:0;margin-top:1px;"></i>
-          For each question, rate from 0 (never/rarely) to 1 (always/usually) based on the child's behaviour.
+          For each question, select <strong>Never / rarely</strong> or <strong>Always / usually</strong> based on the child's behaviour.
         </div>
         <div class="aq-grid">
           <div>
@@ -270,6 +276,7 @@
           <div class="col-md-4">
             <label class="form-label">{{ form.qchat_10_score.label }}</label>
             {{ form.qchat_10_score }}
+            <div class="form-text" id="qchatAutoHint">Calculated automatically from your AQ-10 answers above.</div>
           </div>
           <div class="col-md-4">
             <label class="form-label">{{ form.childhood_autism_rating_scale.label }}</label>
@@ -358,10 +365,10 @@
 
     <!-- Submit -->
     <button type="submit" class="btn-primary-glow w-100" style="padding:1rem;font-size:0.95rem;" id="submitBtn">
-      <i class="bi bi-cpu me-2"></i>Run ASD Screening
+      <i class="bi bi-clipboard2-pulse me-2"></i>Get Screening Result
     </button>
     <p style="text-align:center;font-size:0.75rem;color:var(--text-dim);margin-top:0.75rem;">
-      ⚠️ For research purposes only. Not a substitute for clinical diagnosis.
+      This tool supports early screening only. It does not replace professional medical diagnosis.
     </p>
   </div>
 
@@ -369,13 +376,13 @@
   <div class="result-panel">
     <!-- Result card -->
     <div class="result-card" id="resultCard">
-      <div class="mono-label mb-2">Prediction Result</div>
+      <div class="section-eyebrow mb-2">Screening result</div>
       <div class="result-badge pending" id="resultBadge">
         <i class="bi bi-hourglass" id="resultIcon"></i>
         <span id="resultText">Awaiting Input</span>
       </div>
       <div id="resultDesc" style="font-size:0.83rem;color:var(--text-muted);margin-bottom:1rem;">
-        Complete the form and click "Run ASD Screening" to get a prediction.
+        Complete the form and select "Get Screening Result" to see your screening summary.
       </div>
 
       <div id="xaiNarrative" style="display:none;font-size:0.8rem;color:var(--text-primary);margin-bottom:0.8rem;"></div>
@@ -383,13 +390,13 @@
       <div id="xaiTopFactors" style="display:none;margin-bottom:1rem;"></div>
 
       <div id="xaiChartWrap" style="display:none;">
-        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.4rem;">Feature contribution bars</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);margin-bottom:0.4rem;">Key indicators in this result</div>
         <img id="xaiChart" alt="Feature contribution chart" style="width:100%;border-radius:8px;border:1px solid var(--border);">
       </div>
 
       <div class="confidence-bar-wrap" id="confSection" style="display:none;">
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <span style="font-size:0.78rem;color:var(--text-muted);">Confidence</span>
+          <span style="font-size:0.78rem;color:var(--text-muted);">Screening confidence</span>
           <span id="confValue" style="font-family:var(--font-mono);font-size:0.85rem;color:var(--text-primary);font-weight:700;"></span>
         </div>
         <div class="confidence-bar-track">
@@ -422,18 +429,16 @@
       </div>
     </div>
 
-    <div class="card-dark mt-3" style="padding:1.25rem;">
-      <div style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-dim);text-transform:uppercase;letter-spacing:0.1em;margin-bottom:0.75rem;">Model Info</div>
-      <div style="font-size:0.8rem;color:var(--text-muted);">
-        <div style="display:flex;gap:6px;align-items:center;margin-bottom:0.4rem;">
-          <span class="badge-mono badge-yes">★ Random Forest</span>
-        </div>
-        <div>97% accuracy · 20 estimators · Trained on University of Arkansas dataset</div>
-      </div>
+    <div class="card-dark mt-3" style="padding:1.25rem;border-color:var(--alert-border);">
+      <div class="section-eyebrow" style="color:var(--alert-text);margin-bottom:0.5rem;">Important</div>
+      <p style="font-size:0.82rem;color:var(--text-muted);line-height:1.65;margin:0;">
+        The system provides a screening confidence score to help guide further medical evaluation.
+        <strong>It is not a diagnosis.</strong> Always consult a healthcare professional.
+      </p>
     </div>
 
     <a href="{% url 'ml_app:dashboard' %}" class="btn-outline-glow mt-3 w-100 text-center" style="display:block;padding:0.6rem;">
-      <i class="bi bi-bar-chart-line me-1"></i>View Dashboard
+      <i class="bi bi-grid-3x3-gap me-1"></i>View Overview
     </a>
   </div>
 
@@ -462,7 +467,27 @@ const xaiTopFactors = document.getElementById('xaiTopFactors');
 const xaiChartWrap = document.getElementById('xaiChartWrap');
 const xaiChart = document.getElementById('xaiChart');
 
+function updateQchatFromAq() {
+  const qchatInput = document.getElementById('id_qchat_10_score');
+  if (!qchatInput) return;
+  let total = 0;
+  for (let i = 1; i <= 10; i++) {
+    const el = document.getElementById(`id_a${i}_score`);
+    if (el) total += parseInt(el.value, 10) || 0;
+  }
+  qchatInput.value = Math.min(10, Math.max(0, total));
+}
+
+for (let i = 1; i <= 10; i++) {
+  const aqField = document.getElementById(`id_a${i}_score`);
+  if (aqField) {
+    aqField.addEventListener('change', updateQchatFromAq);
+  }
+}
+updateQchatFromAq();
+
 form.addEventListener('submit', async (e) => {
+  updateQchatFromAq();
   e.preventDefault();
 
   // Show spinner
@@ -501,12 +526,12 @@ function showResult(data) {
   // Update badge
   resultBadge.className = 'result-badge ' + (isYes ? 'yes' : 'no');
   resultIcon.className = isYes ? 'bi bi-exclamation-triangle-fill' : 'bi bi-check-circle-fill';
-  resultText.textContent = isYes ? 'ASD Indicated' : 'ASD Not Indicated';
+  resultText.textContent = isYes ? 'Further evaluation suggested' : 'Low screening concern';
 
   // Description
   resultDesc.textContent = isYes
-    ? 'The model detected significant ASD indicators based on the provided clinical features. Consult a specialist for clinical evaluation.'
-    : 'The model did not detect significant ASD indicators. Continue monitoring developmental milestones.';
+    ? 'Some behavioral indicators suggest further professional evaluation may be helpful. Please consult a qualified healthcare provider.'
+    : 'Fewer concerning patterns were noted in this screening. Continue routine developmental monitoring and discuss any concerns with your care team.';
   resultDesc.style.color = isYes ? 'rgba(248,113,113,0.8)' : 'rgba(74,222,128,0.8)';
 
   // Confidence
@@ -520,7 +545,7 @@ function showResult(data) {
 
   // Meta
   resultMeta.style.display = 'flex';
-  resultModelNote.innerHTML = `<span class="badge-mono">${data.note === 'model' ? '✓ RF Model' : '⚡ Demo'}</span>`;
+  resultModelNote.textContent = data.note === 'model' ? 'Screening complete' : 'Preview mode';
   resultTimestamp.textContent = new Date().toLocaleTimeString();
 
   // XAI text

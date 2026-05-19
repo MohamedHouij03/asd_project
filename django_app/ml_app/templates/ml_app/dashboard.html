@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}Dashboard · NeuroScan ASD{% endblock %}
+{% block title %}Overview · Mindello{% endblock %}
 
 {% block extra_head %}
 <style>
@@ -63,6 +63,9 @@
     .sidebar-nav { display: none; }
     .panel-inner { padding: 1rem; }
   }
+
+  .advanced-analytics summary::-webkit-details-marker { display: none; }
+  .advanced-analytics[open] summary { border-bottom: 1px solid var(--border); margin-bottom: 1rem; }
 </style>
 {% endblock %}
 
@@ -71,16 +74,12 @@
 
   <!-- ── SIDEBAR ── -->
   <aside class="sidebar-nav">
-    <div class="sidebar-label">Analytics</div>
+    <div class="sidebar-label">Overview</div>
     <a class="sidebar-link active" href="#overview"><i class="bi bi-grid"></i> Overview</a>
-    <a class="sidebar-link" href="#charts"><i class="bi bi-bar-chart"></i> Charts</a>
-    <a class="sidebar-link" href="#heatmap"><i class="bi bi-grid-3x3"></i> Heatmap</a>
-    <a class="sidebar-link" href="#models"><i class="bi bi-diagram-3"></i> Models</a>
-    <a class="sidebar-link" href="#features"><i class="bi bi-list-stars"></i> Features</a>
-    <a class="sidebar-link" href="#xai"><i class="bi bi-lightbulb"></i> XAI</a>
-    <a class="sidebar-link" href="#data-table"><i class="bi bi-table"></i> Data Sample</a>
+    <a class="sidebar-link" href="#advanced-analytics"><i class="bi bi-bar-chart"></i> Detailed charts</a>
+    <a class="sidebar-link" href="#data-table"><i class="bi bi-table"></i> Sample records</a>
     <div class="sidebar-label">Navigation</div>
-    <a class="sidebar-link" href="{% url 'ml_app:predict' %}"><i class="bi bi-cpu"></i> Predict</a>
+    <a class="sidebar-link" href="{% url 'ml_app:predict' %}"><i class="bi bi-clipboard2-pulse"></i> Screening</a>
     <a class="sidebar-link" href="{% url 'ml_app:about' %}"><i class="bi bi-info-circle"></i> About</a>
   </aside>
 
@@ -91,12 +90,12 @@
       <!-- Page Header -->
       <div class="page-header" id="overview">
         <div>
-          <div class="mono-label">Research Analytics</div>
-          <h1 class="section-title">Dataset Dashboard</h1>
-          <p class="section-sub">ASD Children Dataset — University of Arkansas</p>
+          <div class="section-eyebrow">Population overview</div>
+          <h1 class="section-title">Screening population overview</h1>
+          <p class="section-sub">Reference data supporting Mindello screening (University of Arkansas research dataset)</p>
         </div>
         <a href="{% url 'ml_app:predict' %}" class="btn-primary-glow" style="align-self:flex-start;padding:0.55rem 1.4rem;font-size:0.82rem;">
-          <i class="bi bi-cpu me-1"></i>Run Prediction
+          <i class="bi bi-clipboard2-pulse me-1"></i>Start Screening
         </a>
       </div>
 
@@ -105,33 +104,38 @@
         <div class="col-6 col-md-3">
           <div class="stat-card fade-up">
             <div class="stat-value">{{ stats.total|default:"—" }}</div>
-            <div class="stat-label">Total Records</div>
+            <div class="stat-label">Children in reference set</div>
           </div>
         </div>
         <div class="col-6 col-md-3">
           <div class="stat-card fade-up fade-up-delay-1" style="--accent:#ef4444;">
             <div class="stat-value" style="color:var(--danger);">{{ stats.asd_yes|default:"—" }}</div>
-            <div class="stat-label">ASD Positive</div>
+            <div class="stat-label">Profiles flagged for follow-up</div>
           </div>
         </div>
         <div class="col-6 col-md-3">
           <div class="stat-card fade-up fade-up-delay-2">
             <div class="stat-value" style="color:var(--accent);">{{ stats.asd_no|default:"—" }}</div>
-            <div class="stat-label">ASD Negative</div>
+            <div class="stat-label">Lower-concern profiles</div>
           </div>
         </div>
         <div class="col-6 col-md-3">
           <div class="stat-card fade-up fade-up-delay-3">
             <div class="stat-value" style="color:var(--accent-violet);">{{ stats.features|default:"—" }}</div>
-            <div class="stat-label">Features</div>
+            <div class="stat-label">Behavioral indicators tracked</div>
           </div>
         </div>
+      </div>
+
+      <div class="alert-dark mb-4" style="font-size:0.88rem;">
+        <i class="bi bi-info-circle me-2"></i>
+        Summary statistics support professional context. They do <strong>not</strong> replace individual screening results or clinical diagnosis.
       </div>
 
       {% if not charts %}
       <div class="alert-dark mb-4">
         <i class="bi bi-info-circle me-2"></i>
-        Dataset not found at <code>data/data_csv.csv</code>. Download from Kaggle and place it there to see charts.
+        Reference charts are temporarily unavailable. Contact your administrator if this persists.
       </div>
 
       {% if charts.shap_summary or charts.shap_beeswarm or charts.shap_waterfall or charts.pdp_age %}
@@ -140,11 +144,11 @@
         <div class="col-lg-6">
           <div class="chart-card fade-up">
             <div class="chart-card-header">
-              <span class="chart-card-title">SHAP Summary</span>
-              <span class="badge-mono">Global XAI</span>
+              <span class="chart-card-title">Indicator impact overview</span>
+              <span class="badge-mono">Advanced</span>
             </div>
             <div class="chart-card-body">
-              <img src="data:image/png;base64,{{ charts.shap_summary }}" alt="SHAP Summary">
+              <img src="data:image/png;base64,{{ charts.shap_summary }}" alt="Indicator impact overview">
             </div>
           </div>
         </div>
@@ -154,11 +158,11 @@
         <div class="col-lg-6">
           <div class="chart-card fade-up fade-up-delay-1">
             <div class="chart-card-header">
-              <span class="chart-card-title">SHAP Beeswarm</span>
-              <span class="badge-mono">Feature Spread</span>
+              <span class="chart-card-title">Indicator spread</span>
+              <span class="badge-mono">Advanced</span>
             </div>
             <div class="chart-card-body">
-              <img src="data:image/png;base64,{{ charts.shap_beeswarm }}" alt="SHAP Beeswarm">
+              <img src="data:image/png;base64,{{ charts.shap_beeswarm }}" alt="Indicator spread">
             </div>
           </div>
         </div>
@@ -170,8 +174,8 @@
         <div class="col-lg-6">
           <div class="chart-card fade-up">
             <div class="chart-card-header">
-              <span class="chart-card-title">Waterfall (Sample Prediction)</span>
-              <span class="badge-mono">Local XAI</span>
+              <span class="chart-card-title">Example screening breakdown</span>
+              <span class="badge-mono">Example</span>
             </div>
             <div class="chart-card-body">
               <img src="data:image/png;base64,{{ charts.shap_waterfall }}" alt="SHAP Waterfall">
@@ -184,8 +188,8 @@
         <div class="col-lg-6">
           <div class="chart-card fade-up fade-up-delay-1">
             <div class="chart-card-header">
-              <span class="chart-card-title">Partial Dependence Plot</span>
-              <span class="badge-mono">PDP</span>
+              <span class="chart-card-title">Age-related screening pattern</span>
+              <span class="badge-mono">Pattern</span>
             </div>
             <div class="chart-card-body">
               <img src="data:image/png;base64,{{ charts.pdp_age }}" alt="PDP Age">
@@ -200,12 +204,20 @@
 
       <!-- ── Row 1: ASD Distribution + Age Distribution ── -->
       {% if charts %}
+      <details class="advanced-analytics mb-4" id="advanced-analytics" style="background:var(--bg-card);border:1px solid var(--border);border-radius:12px;padding:0.5rem 1rem 1rem;">
+        <summary style="cursor:pointer;font-weight:600;padding:0.75rem 0.5rem;color:var(--text-primary);">
+          <i class="bi bi-sliders me-2" style="color:var(--accent);"></i>Advanced analytics view
+          <span style="display:block;font-size:0.82rem;font-weight:400;color:var(--text-muted);margin-top:0.25rem;">
+            Detailed charts for clinicians. Not required for everyday screening.
+          </span>
+        </summary>
+        <div style="padding-top:0.5rem;">
       <div class="row g-3 mb-3" id="charts">
         <div class="col-md-5">
           <div class="chart-card fade-up">
             <div class="chart-card-header">
-              <span class="chart-card-title">ASD Class Distribution</span>
-              <span class="badge-mono">Pie Chart</span>
+              <span class="chart-card-title">Screening outcome distribution</span>
+              <span class="badge-mono">Overview</span>
             </div>
             <div class="chart-card-body">
               <img src="data:image/png;base64,{{ charts.asd_dist }}" alt="ASD Distribution">
@@ -215,8 +227,8 @@
         <div class="col-md-7">
           <div class="chart-card fade-up fade-up-delay-1">
             <div class="chart-card-header">
-              <span class="chart-card-title">Age Distribution</span>
-              <span class="badge-mono">Histogram</span>
+              <span class="chart-card-title">Age distribution</span>
+              <span class="badge-mono">Overview</span>
             </div>
             <div class="chart-card-body">
               <img src="data:image/png;base64,{{ charts.age_dist }}" alt="Age Distribution">
@@ -230,8 +242,8 @@
         <div class="col-md-5">
           <div class="chart-card fade-up">
             <div class="chart-card-header">
-              <span class="chart-card-title">ASD by Gender</span>
-              <span class="badge-mono">Bar Chart</span>
+              <span class="chart-card-title">Outcomes by gender</span>
+              <span class="badge-mono">Overview</span>
             </div>
             <div class="chart-card-body">
               <img src="data:image/png;base64,{{ charts.gender_asd }}" alt="Gender ASD">
@@ -241,8 +253,8 @@
         <div class="col-md-7">
           <div class="chart-card fade-up fade-up-delay-1">
             <div class="chart-card-header">
-              <span class="chart-card-title">Feature Correlation Heatmap</span>
-              <span class="badge-mono">Seaborn</span>
+              <span class="chart-card-title">Indicator relationships</span>
+              <span class="badge-mono">Advanced</span>
             </div>
             <div class="chart-card-body">
               <img src="data:image/png;base64,{{ charts.heatmap }}" alt="Heatmap">
@@ -256,8 +268,8 @@
         <div class="col-md-6">
           <div class="chart-card fade-up">
             <div class="chart-card-header">
-              <span class="chart-card-title">Model Accuracy Comparison</span>
-              <span class="badge-mono badge-yes">★ Best: RF 97%</span>
+              <span class="chart-card-title">Screening method comparison</span>
+              <span class="badge-mono badge-yes">Validated</span>
             </div>
             <div class="chart-card-body">
               <img src="data:image/png;base64,{{ charts.model_comparison }}" alt="Model Comparison">
@@ -267,8 +279,8 @@
         <div class="col-md-6" id="features">
           <div class="chart-card fade-up fade-up-delay-1">
             <div class="chart-card-header">
-              <span class="chart-card-title">Top Feature Importances</span>
-              <span class="badge-mono">Random Forest</span>
+              <span class="chart-card-title">Most influential indicators</span>
+              <span class="badge-mono">Clinical view</span>
             </div>
             <div class="chart-card-body">
               <img src="data:image/png;base64,{{ charts.feature_importance }}" alt="Feature Importance">
@@ -276,12 +288,14 @@
           </div>
         </div>
       </div>
+        </div>
+      </details>
       {% endif %}
 
       <!-- ── Data Sample Table ── -->
       {% if table_data %}
       <div id="data-table" style="margin-top:2rem;">
-        <div class="mono-label mb-2">Data Sample</div>
+        <div class="section-eyebrow mb-2">Sample records (de-identified)</div>
         <div class="data-table-wrap">
           <table class="table-dark-custom">
             <thead>

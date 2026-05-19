@@ -1,73 +1,71 @@
 {% extends "base.html" %}
-{% load custom_filters %}
-{% block title %}About · NeuroScan ASD{% endblock %}
+{% block title %}About · Mindello{% endblock %}
 
 {% block content %}
 <div style="max-width:820px;margin:0 auto;padding:3rem 1.5rem 5rem;">
 
-  <div class="mono-label">Project Overview</div>
-  <h1 class="section-title" style="margin-bottom:0.5rem;">About NeuroScan ASD</h1>
-  <p style="color:var(--text-muted);font-size:0.95rem;line-height:1.8;margin-bottom:2.5rem;">
-    An end-to-end machine learning web application for screening Autism Spectrum Disorder (ASD)
-    indicators in children, built with Django, scikit-learn, and a modern research pipeline.
+  <div class="section-eyebrow">About Mindello</div>
+  <h1 class="section-title" style="margin-bottom:0.5rem;">Early autism screening support</h1>
+  <p style="color:var(--text-muted);font-size:1rem;line-height:1.8;margin-bottom:2.5rem;">
+    Mindello is an AI-assisted screening tool that helps parents and healthcare professionals
+    notice early behavioral indicators and decide whether further evaluation may be helpful.
+    It is designed to feel calm, clear, and respectful of the clinical process.
   </p>
 
   <div class="card-dark mb-3 fade-up">
-    <div class="mono-label" style="margin-bottom:0.75rem;">The Dataset</div>
-    <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.75;margin:0;">
-      The dataset is sourced from the <strong style="color:var(--text-primary);">University of Arkansas Computer Science Department</strong>
-      as part of autism research. It contains clinical and behavioral measurements for children,
-      including the AQ-10 Autism Spectrum Quotient, Q-CHAT-10 score, Childhood Autism Rating Scale (CARS),
-      demographic information, and a range of co-occurring conditions such as speech delay, learning disorders,
-      genetic disorders, and anxiety.
+    <div class="section-eyebrow" style="margin-bottom:0.75rem;">Clinical foundation</div>
+    <p style="font-size:0.92rem;color:var(--text-muted);line-height:1.75;margin:0;">
+      Screening draws on established behavioral measures used in autism research, including
+      the AQ-10 Autism Spectrum Quotient, Q-CHAT-10, and Childhood Autism Rating Scale (CARS),
+      alongside developmental history and co-occurring conditions such as speech delay,
+      learning differences, and anxiety. Data used to build the tool comes from peer-reviewed
+      research at the University of Arkansas Computer Science Department.
     </p>
   </div>
 
+  
   <div class="card-dark mb-3 fade-up fade-up-delay-1">
-    <div class="mono-label" style="margin-bottom:0.75rem;">ML Pipeline</div>
-    <div style="font-size:0.88rem;color:var(--text-muted);line-height:1.75;">
-      <p>The machine learning pipeline consists of four stages documented in Jupyter notebooks:</p>
+    <div class="section-eyebrow" style="margin-bottom:0.75rem;">How screening works</div>
+    <div style="font-size:0.92rem;color:var(--text-muted);line-height:1.75;">
       <ol style="padding-left:1.25rem;margin:0.5rem 0 0;">
-        <li><strong style="color:var(--text-primary);">Exploratory Data Analysis (01_eda.ipynb)</strong> — Understanding distributions, missing values, class balance, and correlations.</li>
-        <li style="margin-top:0.5rem;"><strong style="color:var(--text-primary);">Preprocessing (02_preprocessing.ipynb)</strong> — Label encoding, standard scaling, and feature engineering.</li>
-        <li style="margin-top:0.5rem;"><strong style="color:var(--text-primary);">Modeling (03_modeling.ipynb)</strong> — Training Logistic Regression, Decision Tree, Random Forest, KNN, and SVM.</li>
-        <li style="margin-top:0.5rem;"><strong style="color:var(--text-primary);">Evaluation (04_evaluation.ipynb)</strong> — Comparing accuracy, F1, precision, recall, and confusion matrices.</li>
+        <li style="margin-bottom:0.5rem;"><strong style="color:var(--text-primary);">Behavioral questionnaire</strong> — Parents or clinicians answer guided questions about the child.</li>
+        <li style="margin-bottom:0.5rem;"><strong style="color:var(--text-primary);">Pattern analysis</strong> — Responses are compared with clinically studied indicators.</li>
+        <li style="margin-bottom:0.5rem;"><strong style="color:var(--text-primary);">Risk level estimation</strong> — A screening confidence score helps frame next steps.</li>
+        <li><strong style="color:var(--text-primary);">Recommendation output</strong> — Plain-language guidance on whether further evaluation is advisable.</li>
       </ol>
     </div>
   </div>
 
   <div class="card-dark mb-3 fade-up fade-up-delay-2">
-    <div class="mono-label" style="margin-bottom:0.75rem;">Best Model: Random Forest</div>
-    <p style="font-size:0.88rem;color:var(--text-muted);line-height:1.75;margin:0;">
-      After evaluating all five classifiers, <strong style="color:var(--accent);">Random Forest</strong> was selected as the production model
-      with <strong style="color:var(--accent);">97% accuracy</strong> on the held-out test set. It offers the best trade-off between
-      precision and recall, handles both numerical and categorical features robustly, provides
-      feature importance scores, and is resistant to overfitting via ensemble averaging.
+    <div class="section-eyebrow" style="margin-bottom:0.75rem;">Research-backed evaluation</div>
+    <p style="font-size:0.92rem;color:var(--text-muted);line-height:1.75;margin:0;">
+      We use multiple validated AI models to improve reliability and reduce false results.
+      Models are continuously evaluated for clinical relevance. The system provides a
+      <strong style="color:var(--text-primary);">screening confidence score</strong> — not a diagnosis.
     </p>
   </div>
 
   <div class="card-dark mb-3 fade-up fade-up-delay-2">
-    <div class="mono-label" style="margin-bottom:0.75rem;">Tech Stack</div>
-    <div style="display:flex;flex-wrap:wrap;gap:8px;">
-      {% for tech in "Django 4.2,scikit-learn,Pandas,NumPy,Matplotlib,Seaborn,Joblib,Bootstrap 5,Jupyter,SQLite,Python 3"|split:"," %}
-      <span class="badge-mono">{{ tech }}</span>
-      {% endfor %}
-    </div>
+    <div class="section-eyebrow" style="margin-bottom:0.75rem;">Who it is for</div>
+    <p style="font-size:0.92rem;color:var(--text-muted);line-height:1.75;margin:0;">
+      <strong style="color:var(--text-primary);">Parents and caregivers</strong> seeking a structured first step.
+      <strong style="color:var(--text-primary);">Clinicians</strong> who want a quick, consistent screening summary to support — not replace — their judgment.
+    </p>
   </div>
 
   <div class="alert-dark fade-up">
     <i class="bi bi-exclamation-triangle me-2"></i>
-    <strong>Disclaimer:</strong> This tool is for <strong>research and educational purposes only</strong>.
-    It is not a clinical diagnostic tool and should not replace professional medical evaluation.
-    Always consult a qualified healthcare provider for diagnosis.
+    <strong>Important:</strong> This tool supports awareness and early screening only.
+    It does not replace professional medical diagnosis. Always consult a qualified
+    healthcare provider for diagnosis and care planning.
   </div>
 
   <div style="margin-top:2rem;text-align:center;">
     <a href="{% url 'ml_app:predict' %}" class="btn-primary-glow me-3">
-      <i class="bi bi-cpu me-2"></i>Try the Screening
+      <i class="bi bi-clipboard2-pulse me-2"></i>Start Screening
     </a>
     <a href="{% url 'ml_app:dashboard' %}" class="btn-outline-glow">
-      <i class="bi bi-bar-chart me-2"></i>View Dashboard
+      <i class="bi bi-grid-3x3-gap me-2"></i>View Overview
     </a>
   </div>
 
