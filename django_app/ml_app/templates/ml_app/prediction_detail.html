@@ -1,0 +1,448 @@
+{% extends "base.html" %}
+{% block title %}Screening Result #{{ prediction.pk }} · Mindello{% endblock %}
+
+{% block extra_head %}
+<style>
+  .detail-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .detail-header {
+    margin-bottom: 2rem;
+  }
+
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: var(--accent-blue);
+    text-decoration: none;
+    font-weight: 600;
+    font-size: 0.9rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+  }
+
+  .back-link:hover {
+    gap: 0.75rem;
+  }
+
+  .result-banner {
+    background: var(--bg-card);
+    border: 2px solid;
+    border-radius: 14px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    text-align: center;
+  }
+
+  .result-banner.risk {
+    border-color: rgba(248, 113, 113, 0.4);
+    background: linear-gradient(135deg, rgba(248, 113, 113, 0.08), rgba(251, 146, 60, 0.08));
+  }
+
+  .result-banner.clear {
+    border-color: rgba(16, 185, 129, 0.4);
+    background: linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(20, 184, 166, 0.08));
+  }
+
+  .result-badge-large {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 2.5rem;
+    margin: 0 auto 1rem;
+  }
+
+  .result-badge-large.risk {
+    background: linear-gradient(135deg, #f87171, #fb923c);
+    box-shadow: 0 8px 24px rgba(248, 113, 113, 0.2);
+  }
+
+  .result-badge-large.clear {
+    background: linear-gradient(135deg, #10b981, #14b8a6);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.2);
+  }
+
+  .result-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin: 0;
+  }
+
+  .result-subtitle {
+    color: var(--text-muted);
+    margin-top: 0.5rem;
+    font-size: 0.95rem;
+  }
+
+  .confidence-display {
+    margin-top: 1.5rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .confidence-label {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 0.5rem;
+  }
+
+  .confidence-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--progress-track);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+  }
+
+  .confidence-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 1s ease;
+  }
+
+  .confidence-fill.risk {
+    background: linear-gradient(90deg, #f87171, #fb923c);
+    width: {{ prediction.confidence }}%;
+  }
+
+  .confidence-fill.clear {
+    background: linear-gradient(90deg, #10b981, #14b8a6);
+    width: {{ prediction.confidence }}%;
+  }
+
+  .confidence-value {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  .data-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .data-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+  }
+
+  .data-card-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .data-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.5rem 0;
+    border-bottom: 1px solid rgba(15, 23, 42, 0.06);
+  }
+
+  .data-item:last-child {
+    border-bottom: none;
+  }
+
+  .data-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .data-value {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 700;
+  }
+
+  .aq-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 0.75rem;
+    margin-top: 1rem;
+  }
+
+  .aq-item {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem;
+    text-align: center;
+  }
+
+  .aq-label {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    font-weight: 600;
+    margin-bottom: 0.25rem;
+  }
+
+  .aq-value {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--accent-blue);
+  }
+
+  .recommendation-card {
+    background: rgba(99, 102, 241, 0.08);
+    border: 1px solid rgba(99, 102, 241, 0.2);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-top: 2rem;
+  }
+
+  .recommendation-title {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.75rem;
+  }
+
+  .recommendation-text {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    line-height: 1.6;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .btn {
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .btn-primary {
+    background: var(--accent-blue);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(37, 99, 235, 0.08);
+  }
+
+  @media (max-width: 768px) {
+    .data-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .aq-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+
+    .action-buttons {
+      flex-direction: column;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="detail-container">
+  <!-- Back Link -->
+  <a href="{% url 'ml_app:history' %}" class="back-link">
+    <i class="bi bi-arrow-left"></i> Back to History
+  </a>
+
+  <!-- Result Banner -->
+  <div class="result-banner {% if prediction.prediction == 'YES' %}risk{% else %}clear{% endif %}">
+    <div class="result-badge-large {% if prediction.prediction == 'YES' %}risk{% else %}clear{% endif %}">
+      {% if prediction.prediction == 'YES' %}
+        ⚠️
+      {% else %}
+        ✓
+      {% endif %}
+    </div>
+
+    <h1 class="result-title">
+      {% if prediction.prediction == 'YES' %}
+        Risk of ASD Traits Detected
+      {% else %}
+        No Significant ASD Risk Detected
+      {% endif %}
+    </h1>
+
+    <p class="result-subtitle">
+      {% if prediction.prediction == 'YES' %}
+        This screening indicates behavioral traits consistent with autism spectrum characteristics.
+      {% else %}
+        This screening indicates no significant behavioral traits consistent with autism spectrum.
+      {% endif %}
+    </p>
+
+    {% if prediction.confidence %}
+      <div class="confidence-display">
+        <div class="confidence-label">Prediction Confidence</div>
+        <div class="confidence-bar">
+          <div class="confidence-fill {% if prediction.prediction == 'YES' %}risk{% else %}clear{% endif %}"></div>
+        </div>
+        <div class="confidence-value">{{ prediction.confidence }}% Confidence</div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Data Sections -->
+  <div class="data-grid">
+    <!-- Demographics -->
+    <div class="data-card">
+      <div class="data-card-title">Demographics</div>
+      <div class="data-item">
+        <span class="data-label">Age</span>
+        <span class="data-value">{{ prediction.age }} years</span>
+      </div>
+      <div class="data-item">
+        <span class="data-label">Sex</span>
+        <span class="data-value">{{ prediction.sex|upper }}</span>
+      </div>
+      <div class="data-item">
+        <span class="data-label">Ethnicity</span>
+        <span class="data-value">{{ prediction.ethnicity }}</span>
+      </div>
+    </div>
+
+    <!-- Clinical Scores -->
+    <div class="data-card">
+      <div class="data-card-title">Clinical Scores</div>
+      <div class="data-item">
+        <span class="data-label">Q-CHAT-10</span>
+        <span class="data-value">{{ prediction.qchat_10_score }}/10</span>
+      </div>
+      <div class="data-item">
+        <span class="data-label">CARS</span>
+        <span class="data-value">{{ prediction.childhood_autism_rating_scale }}</span>
+      </div>
+      <div class="data-item">
+        <span class="data-label">AQ Total</span>
+        <span class="data-value">{{ aq_total }}/10</span>
+      </div>
+    </div>
+
+    <!-- Medical History -->
+    <div class="data-card">
+      <div class="data-card-title">Medical History</div>
+      <div class="data-item">
+        <span class="data-label">Jaundice</span>
+        <span class="data-value">
+          {% if prediction.jaundice == '1' %}
+            <span style="color: #ef4444;">Yes</span>
+          {% else %}
+            <span style="color: #10b981;">No</span>
+          {% endif %}
+        </span>
+      </div>
+      <div class="data-item">
+        <span class="data-label">Family ASD History</span>
+        <span class="data-value">
+          {% if prediction.family_mem_with_asd == '1' %}
+            <span style="color: #ef4444;">Yes</span>
+          {% else %}
+            <span style="color: #10b981;">No</span>
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- AQ Scores Breakdown -->
+  <div class="data-card" style="margin-top: 1.5rem;">
+    <div class="data-card-title">Autism Quotient (AQ) Items (0-1 each)</div>
+    <div class="aq-grid">
+      {% for key, value in prediction_data.aq_scores.items %}
+        <div class="aq-item">
+          <div class="aq-label">{{ key }}</div>
+          <div class="aq-value">{{ value }}</div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Co-occurring Conditions -->
+  <div class="data-card" style="margin-top: 1.5rem;">
+    <div class="data-card-title">Co-occurring Conditions</div>
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 1rem; margin-top: 1rem;">
+      {% for condition, value in prediction_data.conditions.items %}
+        <div style="display: flex; align-items: center; gap: 0.5rem;">
+          <i class="bi {% if value == '1' %}bi-check-circle-fill{% else %}bi-x-circle-fill{% endif %}" style="color: {% if value == '1' %}#ef4444{% else %}#10b981{% endif %};"></i>
+          <span style="font-size: 0.9rem;">{{ condition }}: <strong>{% if value == '1' %}Yes{% else %}No{% endif %}</strong></span>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Recommendation Card -->
+  <div class="recommendation-card">
+    <div class="recommendation-title">
+      <i class="bi bi-info-circle-fill"></i>
+      Important Information
+    </div>
+    <div class="recommendation-text">
+      <p>
+        <strong>This is a screening result, not a diagnosis.</strong> Screening tools are designed to identify children who may benefit from further evaluation by a healthcare professional. Only qualified medical professionals can provide a formal diagnosis of autism spectrum disorder (ASD).
+      </p>
+      <p>
+        If you have concerns about developmental or behavioral characteristics, please consult with your child's healthcare provider, pediatrician, or a specialist in developmental disorders.
+      </p>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="action-buttons">
+    <a href="{% url 'ml_app:predict' %}" class="btn btn-primary">
+      <i class="bi bi-plus-circle"></i> New Screening
+    </a>
+    <a href="{% url 'ml_app:history' %}" class="btn btn-secondary">
+      <i class="bi bi-clock-history"></i> View History
+    </a>
+  </div>
+</div>
+
+{% endblock %}

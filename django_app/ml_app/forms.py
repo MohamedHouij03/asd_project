@@ -85,6 +85,61 @@ class LoginForm(forms.Form):
     )
 
 
+class UserProfileForm(forms.ModelForm):
+    """Form for editing user profile information."""
+    
+    first_name = forms.CharField(
+        max_length=30,
+        required=False,
+        label="First Name",
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "First Name"})
+    )
+    last_name = forms.CharField(
+        max_length=150,
+        required=False,
+        label="Last Name",
+        widget=forms.TextInput(attrs={"class": "form-control", "placeholder": "Last Name"})
+    )
+    email = forms.EmailField(
+        required=False,
+        label="Email Address",
+        widget=forms.EmailInput(attrs={"class": "form-control", "placeholder": "Email"})
+    )
+    
+    class Meta:
+        model = UserProfile
+        fields = ('phone', 'organization')
+        widgets = {
+            'phone': forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Phone Number (Optional)"
+            }),
+            'organization': forms.TextInput(attrs={
+                "class": "form-control",
+                "placeholder": "Organization/Clinic (For Doctors)"
+            }),
+        }
+    
+    def __init__(self, *args, **kwargs):
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if self.user:
+            self.fields['first_name'].initial = self.user.first_name
+            self.fields['last_name'].initial = self.user.last_name
+            self.fields['email'].initial = self.user.email
+            self.fields['email'].disabled = True  # Prevent changing email in this form
+    
+    def save(self, commit=True):
+        profile = super().save(commit=False)
+        if self.user:
+            self.user.first_name = self.cleaned_data.get('first_name', '')
+            self.user.last_name = self.cleaned_data.get('last_name', '')
+            if commit:
+                self.user.save()
+                profile.save()
+        return profile
+
+
 # ─────────────────────────────────────────────────────────────────────────────
 # PREDICTION FORM
 # ─────────────────────────────────────────────────────────────────────────────
@@ -108,7 +163,7 @@ class PredictionForm(forms.Form):
         widget=forms.NumberInput(attrs={"class":"form-control","step":"0.5","min":0,"max":18}))
 
     qchat_10_score = forms.IntegerField(
-        min_value=0, max_value=10, label="Q-CHAT-10 Score (0–10)",
+        min_value=0, max_value=10, label="Overall observation score (0–10)",
         widget=forms.NumberInput(attrs={
             "class": "form-control",
             "min": 0,
@@ -119,27 +174,27 @@ class PredictionForm(forms.Form):
         }))
 
     social_responsiveness_scale = forms.FloatField(
-        min_value=0, max_value=10, required=False, label="Social Responsiveness Scale — SRS (0–10)",
+        min_value=0, max_value=10, required=False, label="Social interaction observation (0–10)",
         widget=forms.NumberInput(attrs={"class":"form-control","step":"0.5","min":0,"max":10}))
 
     childhood_autism_rating_scale = forms.FloatField(
-        min_value=15, max_value=60, label="Childhood Autism Rating Scale — CARS (15–60)",
+        min_value=15, max_value=60, label="Developmental observation (15–60)",
         widget=forms.NumberInput(attrs={"class":"form-control","step":"0.5","min":15,"max":60}))
 
     # ── Demographics ─────────────────────────────────────────────────────
     sex       = forms.ChoiceField(choices=SEX_CHOICES, label="Sex", widget=forms.Select(attrs={"class":"form-select"}))
     ethnicity = forms.ChoiceField(choices=ETHNICITY_CHOICES, label="Ethnicity", widget=forms.Select(attrs={"class":"form-select"}))
     jaundice  = forms.ChoiceField(choices=YES_NO_CHOICES, label="Born with Jaundice?", widget=forms.Select(attrs={"class":"form-select"}))
-    family_mem_with_asd = forms.ChoiceField(choices=YES_NO_CHOICES, label="Family member with ASD?", widget=forms.Select(attrs={"class":"form-select"}))
+    family_mem_with_asd = forms.ChoiceField(choices=YES_NO_CHOICES, label="Family member with similar traits?", widget=forms.Select(attrs={"class":"form-select"}))
 
     # ── Co-occurring conditions ───────────────────────────────────────────
-    speech_delay              = forms.ChoiceField(choices=YES_NO_CHOICES, label="Speech Delay / Language Disorder?", widget=forms.Select(attrs={"class":"form-select"}))
-    learning_disorder         = forms.ChoiceField(choices=YES_NO_CHOICES, label="Learning Disorder?", widget=forms.Select(attrs={"class":"form-select"}))
-    genetic_disorders         = forms.ChoiceField(choices=YES_NO_CHOICES, label="Genetic Disorders?", widget=forms.Select(attrs={"class":"form-select"}))
-    depression                = forms.ChoiceField(choices=YES_NO_CHOICES, label="Depression?", widget=forms.Select(attrs={"class":"form-select"}))
-    global_developmental_delay= forms.ChoiceField(choices=YES_NO_CHOICES, label="Global Developmental Delay / Intellectual Disability?", widget=forms.Select(attrs={"class":"form-select"}))
-    social_behavioural_issues = forms.ChoiceField(choices=YES_NO_CHOICES, label="Social / Behavioural Issues?", widget=forms.Select(attrs={"class":"form-select"}))
-    anxiety_disorder          = forms.ChoiceField(choices=YES_NO_CHOICES, label="Anxiety Disorder?", widget=forms.Select(attrs={"class":"form-select"}))
+    speech_delay              = forms.ChoiceField(choices=YES_NO_CHOICES, label="Speech or language development differences?", widget=forms.Select(attrs={"class":"form-select"}))
+    learning_disorder         = forms.ChoiceField(choices=YES_NO_CHOICES, label="Learning differences?", widget=forms.Select(attrs={"class":"form-select"}))
+    genetic_disorders         = forms.ChoiceField(choices=YES_NO_CHOICES, label="Genetic conditions?", widget=forms.Select(attrs={"class":"form-select"}))
+    depression                = forms.ChoiceField(choices=YES_NO_CHOICES, label="Depression or low mood?", widget=forms.Select(attrs={"class":"form-select"}))
+    global_developmental_delay= forms.ChoiceField(choices=YES_NO_CHOICES, label="Developmental delay or intellectual differences?", widget=forms.Select(attrs={"class":"form-select"}))
+    social_behavioural_issues = forms.ChoiceField(choices=YES_NO_CHOICES, label="Social or behavioural differences?", widget=forms.Select(attrs={"class":"form-select"}))
+    anxiety_disorder          = forms.ChoiceField(choices=YES_NO_CHOICES, label="Anxiety?", widget=forms.Select(attrs={"class":"form-select"}))
 
     def clean(self):
         cleaned = super().clean()

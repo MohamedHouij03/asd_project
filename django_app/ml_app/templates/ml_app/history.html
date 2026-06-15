@@ -1,0 +1,371 @@
+{% extends "base.html" %}
+{% block title %}Screening History · Mindello{% endblock %}
+
+{% block extra_head %}
+<style>
+  .history-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 4rem;
+  }
+
+  .history-header {
+    margin-bottom: 2rem;
+  }
+
+  .history-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .history-subtitle {
+    color: var(--text-muted);
+    font-size: 0.95rem;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 3rem 2rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    border-style: dashed;
+  }
+
+  .empty-state-icon {
+    font-size: 4rem;
+    color: var(--text-dim);
+    margin-bottom: 1rem;
+  }
+
+  .empty-state-text {
+    font-size: 1.1rem;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state-subtext {
+    color: var(--text-muted);
+    margin-bottom: 1.5rem;
+  }
+
+  .prediction-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: all 0.2s;
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1.5rem;
+    align-items: center;
+  }
+
+  .prediction-card:hover {
+    border-color: var(--accent-blue);
+    box-shadow: 0 4px 12px rgba(37, 99, 235, 0.08);
+  }
+
+  .prediction-result-badge {
+    width: 80px;
+    height: 80px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 1.4rem;
+    color: white;
+  }
+
+  .prediction-result-badge.yes {
+    background: linear-gradient(135deg, #f87171, #fb923c);
+    box-shadow: 0 4px 12px rgba(248, 113, 113, 0.2);
+  }
+
+  .prediction-result-badge.no {
+    background: linear-gradient(135deg, #10b981, #14b8a6);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+  }
+
+  .prediction-result-badge-label {
+    font-size: 0.7rem;
+    font-weight: 600;
+    margin-top: 0.25rem;
+    opacity: 0.9;
+  }
+
+  .prediction-info {
+    flex: 1;
+  }
+
+  .prediction-scores {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .score-item {
+    font-size: 0.8rem;
+  }
+
+  .score-label {
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .score-value {
+    color: var(--text-primary);
+    font-weight: 700;
+    font-size: 1rem;
+  }
+
+  .prediction-meta {
+    display: flex;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+    flex-wrap: wrap;
+  }
+
+  .meta-tag {
+    background: var(--section-soft-bg);
+    color: var(--accent-blue);
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+
+  .prediction-date {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    text-align: right;
+  }
+
+  .prediction-date-value {
+    font-size: 0.9rem;
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+
+  .prediction-date-time {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+
+  .view-details-btn {
+    background: var(--accent-blue);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    padding: 0.6rem 1.2rem;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+    display: inline-block;
+  }
+
+  .view-details-btn:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+  }
+
+  .pagination-wrapper {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    margin-top: 2.5rem;
+  }
+
+  .pagination-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-card);
+    color: var(--text-primary);
+    text-decoration: none;
+    transition: all 0.2s;
+    font-weight: 600;
+  }
+
+  .pagination-link:hover {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+  }
+
+  .pagination-link.active {
+    background: var(--accent-blue);
+    color: white;
+    border-color: var(--accent-blue);
+  }
+
+  .pagination-link.disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  @media (max-width: 768px) {
+    .prediction-card {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .prediction-result-badge {
+      width: 60px;
+      height: 60px;
+      font-size: 1.1rem;
+    }
+
+    .prediction-date {
+      text-align: left;
+    }
+
+    .prediction-scores {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="history-container">
+  <!-- Header -->
+  <div class="history-header">
+    <h1 class="history-title"><i class="bi bi-clock-history"></i> Screening History</h1>
+    <p class="history-subtitle">Review all your past screening records and results.</p>
+  </div>
+
+  <!-- Empty State -->
+  {% if not predictions %}
+    <div class="empty-state">
+      <div class="empty-state-icon">
+        <i class="bi bi-inbox"></i>
+      </div>
+      <div class="empty-state-text">No screenings yet</div>
+      <p class="empty-state-subtext">Complete a screening to see your history here.</p>
+      <a href="{% url 'ml_app:predict' %}" class="view-details-btn">
+        <i class="bi bi-arrow-right"></i> Start New Screening
+      </a>
+    </div>
+  {% else %}
+
+    <!-- Prediction List -->
+    {% for prediction in predictions %}
+      <div class="prediction-card">
+        <!-- Result Badge -->
+        <div class="prediction-result-badge {% if prediction.prediction == 'YES' %}yes{% else %}no{% endif %}">
+          {% if prediction.prediction == 'YES' %}
+            <span>⚠️</span>
+            <div class="prediction-result-badge-label">RISK</div>
+          {% else %}
+            <span>✓</span>
+            <div class="prediction-result-badge-label">CLEAR</div>
+          {% endif %}
+        </div>
+
+        <!-- Main Info -->
+        <div class="prediction-info">
+          <div style="display: flex; align-items: baseline; gap: 1rem; margin-bottom: 0.5rem;">
+            <h3 style="margin: 0; font-size: 1.05rem;">
+              Screening #{{ prediction.pk }}
+            </h3>
+            <span style="background: {% if prediction.prediction == 'YES' %}rgba(248,113,113,0.12){% else %}rgba(16,185,129,0.12){% endif %}; color: {% if prediction.prediction == 'YES' %}#f87171{% else %}#10b981{% endif %}; padding: 0.25rem 0.75rem; border-radius: 20px; font-size: 0.8rem; font-weight: 600;">
+              {{ prediction.prediction|upper }}
+            </span>
+          </div>
+
+          {% if prediction.confidence %}
+            <div style="font-size: 0.85rem; color: var(--text-muted);">
+              Confidence: <strong>{{ prediction.confidence }}%</strong>
+            </div>
+          {% endif %}
+
+          <!-- Key Scores -->
+          <div class="prediction-scores">
+            <div class="score-item">
+              <div class="score-label">Age</div>
+              <div class="score-value">{{ prediction.age }} yrs</div>
+            </div>
+            <div class="score-item">
+              <div class="score-label">AQ Total</div>
+              <div class="score-value">{{ prediction.a1_score|add:prediction.a2_score|add:prediction.a3_score|add:prediction.a4_score|add:prediction.a5_score|add:prediction.a6_score|add:prediction.a7_score|add:prediction.a8_score|add:prediction.a9_score|add:prediction.a10_score }}/10</div>
+            </div>
+            <div class="score-item">
+              <div class="score-label">Q-CHAT-10</div>
+              <div class="score-value">{{ prediction.qchat_10_score }}/10</div>
+            </div>
+            <div class="score-item">
+              <div class="score-label">CARS</div>
+              <div class="score-value">{{ prediction.childhood_autism_rating_scale }}</div>
+            </div>
+          </div>
+
+          <div class="prediction-meta">
+            <span class="meta-tag">{{ prediction.sex|upper }}</span>
+            <span class="meta-tag">{{ prediction.ethnicity }}</span>
+          </div>
+        </div>
+
+        <!-- Date & Action -->
+        <div style="display: flex; flex-direction: column; gap: 1rem; align-items: flex-end;">
+          <div class="prediction-date">
+            <div class="prediction-date-value">{{ prediction.created_at|date:"b d, Y" }}</div>
+            <div class="prediction-date-time">{{ prediction.created_at|time:"H:i" }}</div>
+          </div>
+          <a href="{% url 'ml_app:prediction_detail' prediction.pk %}" class="view-details-btn">
+            View Details
+          </a>
+        </div>
+      </div>
+    {% endfor %}
+
+    <!-- Pagination -->
+    {% if page_obj.has_other_pages %}
+      <div class="pagination-wrapper">
+        {% if page_obj.has_previous %}
+          <a href="?page=1" class="pagination-link" title="First page">
+            <i class="bi bi-chevron-double-left"></i>
+          </a>
+          <a href="?page={{ page_obj.previous_page_number }}" class="pagination-link">
+            {{ page_obj.previous_page_number }}
+          </a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+            <span class="pagination-link active">{{ num }}</span>
+          {% elif num > page_obj.number|add:'-3' and num < page_obj.number|add:'3' %}
+            <a href="?page={{ num }}" class="pagination-link">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+          <a href="?page={{ page_obj.next_page_number }}" class="pagination-link">
+            {{ page_obj.next_page_number }}
+          </a>
+          <a href="?page={{ page_obj.paginator.num_pages }}" class="pagination-link" title="Last page">
+            <i class="bi bi-chevron-double-right"></i>
+          </a>
+        {% endif %}
+      </div>
+    {% endif %}
+
+  {% endif %}
+</div>
+
+{% endblock %}

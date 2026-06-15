@@ -1,0 +1,225 @@
+/* Predict Page Styles */
+
+.predict-layout {
+  display: grid;
+  grid-template-columns: 1fr 380px;
+  gap: 1.5rem;
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 2rem 1.5rem 4rem;
+}
+
+@media (max-width: 900px) {
+  .predict-layout {
+    grid-template-columns: 1fr;
+  }
+  .result-panel {
+    order: -1;
+  }
+}
+
+.form-section {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.form-section-header {
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid var(--border);
+  background: var(--section-soft-bg);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.form-section-icon {
+  width: 32px;
+  height: 32px;
+  background: rgba(96, 165, 250, 0.12);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  color: var(--accent-blue);
+  flex-shrink: 0;
+}
+
+.form-section-title {
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--text-primary);
+}
+
+.form-section-body {
+  padding: 1.5rem;
+}
+
+/* Result Panel */
+.result-panel {
+  position: sticky;
+  top: 76px;
+}
+
+.result-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.75rem;
+  transition: all 0.4s;
+}
+
+.result-card.result-yes {
+  border-color: rgba(248, 113, 113, 0.4);
+  box-shadow: 0 0 30px rgba(248, 113, 113, 0.08);
+}
+
+.result-card.result-no {
+  border-color: rgba(74, 222, 128, 0.4);
+  box-shadow: 0 0 30px rgba(74, 222, 128, 0.08);
+}
+
+.result-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0.5rem 1.2rem;
+  border-radius: 30px;
+  font-family: var(--font-mono);
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  margin-bottom: 1rem;
+}
+
+.result-badge.yes {
+  background: rgba(248, 113, 113, 0.12);
+  color: var(--danger);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+}
+
+.result-badge.no {
+  background: rgba(74, 222, 128, 0.12);
+  color: var(--accent);
+  border: 1px solid rgba(74, 222, 128, 0.3);
+}
+
+.result-badge.pending {
+  background: rgba(99, 179, 237, 0.08);
+  color: var(--text-dim);
+  border: 1px solid var(--border);
+}
+
+.confidence-bar-wrap {
+  margin-top: 1rem;
+}
+
+.confidence-bar-track {
+  height: 6px;
+  border-radius: 3px;
+  background: var(--progress-track);
+  overflow: hidden;
+  margin-top: 0.4rem;
+}
+
+.confidence-bar-fill {
+  height: 100%;
+  border-radius: 3px;
+  transition: width 1s ease;
+  background: linear-gradient(90deg, var(--accent), #22d3ee);
+}
+
+.confidence-bar-fill.danger {
+  background: linear-gradient(90deg, #f87171, #fb923c);
+}
+
+.result-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* AQ Score grid */
+.aq-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.85rem;
+}
+
+/* Spinner overlay */
+.predict-spinner {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: var(--spinner-overlay-bg);
+  z-index: 9999;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(6px);
+}
+
+.predict-spinner.active {
+  display: flex;
+}
+
+.spinner-box {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 2.5rem 3rem;
+  text-align: center;
+}
+
+.section-divider {
+  border: none;
+  border-top: 1px solid var(--border);
+  margin: 1.5rem 0;
+}
+
+.info-tip {
+  background: var(--info-tip-bg);
+  border: 1px solid var(--info-tip-border);
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.8rem;
+  color: var(--info-tip-text);
+  margin-bottom: 1.25rem;
+  display: flex;
+  gap: 8px;
+}
+
+#id_qchat_10_score {
+  background: var(--bg-elevated);
+  cursor: not-allowed;
+  font-weight: 600;
+}
+
+/* Animation classes */
+.fade-up {
+  animation: fadeUp 0.6s ease-out;
+}
+
+.fade-up-delay-1 {
+  animation: fadeUp 0.6s ease-out 0.1s both;
+}
+
+.fade-up-delay-2 {
+  animation: fadeUp 0.6s ease-out 0.2s both;
+}
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+{% load custom_filters %}
+{% block title %}Profile · Mindello{% endblock %}
+
+{% block extra_head %}
+<style>
+  .profile-container {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+  }
+
+  .profile-header {
+    text-align: center;
+    margin-bottom: 2.5rem;
+  }
+
+  .profile-avatar {
+    width: 120px;
+    height: 120px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--accent-blue), var(--accent-violet));
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    font-size: 3rem;
+    color: white;
+    box-shadow: 0 8px 24px rgba(37, 99, 235, 0.2);
+  }
+
+  .profile-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 2rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .profile-section-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .profile-info-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    align-items: center;
+  }
+
+  .profile-label {
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    font-weight: 600;
+  }
+
+  .profile-value {
+    font-size: 0.95rem;
+    color: var(--text-primary);
+  }
+
+  .role-badge {
+    display: inline-block;
+    padding: 0.4rem 0.9rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    width: fit-content;
+  }
+
+  .role-badge.parent {
+    background: rgba(59, 130, 246, 0.12);
+    color: var(--accent-blue);
+    border: 1px solid rgba(59, 130, 246, 0.3);
+  }
+
+  .role-badge.doctor {
+    background: rgba(16, 185, 129, 0.12);
+    color: var(--accent);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+  }
+
+  .form-group {
+    margin-bottom: 1.5rem;
+  }
+
+  .form-group label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin-bottom: 0.5rem;
+  }
+
+  .form-group input {
+    width: 100%;
+    padding: 0.65rem 0.9rem;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    transition: all 0.2s;
+  }
+
+  .form-group input:focus {
+    outline: none;
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+  }
+
+  .form-group input:disabled {
+    background: rgba(15, 23, 42, 0.05);
+    color: var(--text-dim);
+    cursor: not-allowed;
+  }
+
+  .button-group {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+  }
+
+  .btn {
+    padding: 0.7rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .btn-primary {
+    background: var(--accent-blue);
+    color: white;
+  }
+
+  .btn-primary:hover {
+    background: #1d4ed8;
+    transform: translateY(-2px);
+  }
+
+  .btn-secondary {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border: 1px solid var(--border);
+  }
+
+  .btn-secondary:hover {
+    background: rgba(37, 99, 235, 0.08);
+  }
+
+  .text-muted-small {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    margin-top: 0.25rem;
+  }
+
+  .alert {
+    padding: 1rem;
+    border-radius: 8px;
+    margin-bottom: 1.5rem;
+  }
+
+  .alert-success {
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    color: var(--accent);
+  }
+
+  .alert-danger {
+    background: rgba(220, 38, 38, 0.12);
+    border: 1px solid rgba(220, 38, 38, 0.3);
+    color: var(--danger);
+  }
+
+  @media (max-width: 600px) {
+    .profile-info-row {
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+    
+    .button-group {
+      flex-direction: column;
+    }
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+
+<div class="profile-container">
+  <!-- Header -->
+  <div class="profile-header">
+    <div class="profile-avatar">
+      <i class="bi bi-person-circle"></i>
+    </div>
+    <h1 style="font-size: 1.8rem; margin: 1rem 0 0.5rem;">{{ user.get_full_name|default:user.username }}</h1>
+    <p style="color: var(--text-muted); margin: 0;">@{{ user.username }}</p>
+  </div>
+
+  <!-- Messages -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="alert alert-{{ message.tags }}">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- User Info Card -->
+  <div class="profile-card">
+    <div class="profile-section-title">Account Information</div>
+    
+    <div class="profile-info-row">
+      <div class="profile-label">Email</div>
+      <div class="profile-value">{{ user.email }}</div>
+    </div>
+
+    <div class="profile-info-row">
+      <div class="profile-label">Member Since</div>
+      <div class="profile-value">{{ profile.created_at|date:"b d, Y" }}</div>
+    </div>
+
+    <div class="profile-info-row">
+      <div class="profile-label">Role</div>
+      <div class="profile-value">
+        <span class="role-badge {{ profile.role }}">
+          {% if profile.role == 'doctor' %}
+            <i class="bi bi-heart-pulse"></i> Medical Professional
+          {% else %}
+            <i class="bi bi-person-fill"></i> Parent/Guardian
+          {% endif %}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Profile Settings Card -->
+  <div class="profile-card">
+    <div class="profile-section-title">Profile Settings</div>
+
+    <form method="POST">
+      {% csrf_token %}
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem;">
+        <div class="form-group">
+          <label for="id_first_name">First Name</label>
+          {{ form.first_name }}
+        </div>
+        <div class="form-group">
+          <label for="id_last_name">Last Name</label>
+          {{ form.last_name }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="id_email">Email Address</label>
+        {{ form.email }}
+        <div class="text-muted-small">Email cannot be changed here. Contact support if you need to update it.</div>
+      </div>
+
+      <div class="form-group">
+        <label for="id_phone">Phone Number</label>
+        {{ form.phone }}
+      </div>
+
+      {% if profile.role == 'doctor' %}
+        <div class="form-group">
+          <label for="id_organization">Organization / Clinic</label>
+          {{ form.organization }}
+        </div>
+      {% endif %}
+
+      <div class="button-group">
+        <button type="submit" class="btn btn-primary">
+          <i class="bi bi-check-circle"></i> Save Changes
+        </button>
+        <a href="{% url 'ml_app:dashboard' %}" class="btn btn-secondary">
+          <i class="bi bi-x-circle"></i> Cancel
+        </a>
+      </div>
+    </form>
+  </div>
+
+  <!-- Quick Actions -->
+  <div class="profile-card" style="border-top: 2px solid var(--border);">
+    <div class="profile-section-title">Security</div>
+    
+    <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+      <a href="{% url 'auth:password_reset' %}" class="btn btn-secondary" style="text-align: left; text-decoration: none;">
+        <i class="bi bi-shield-lock"></i> Change Password
+      </a>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

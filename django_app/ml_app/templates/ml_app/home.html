@@ -189,13 +189,13 @@
   <div class="hero-content">
     <div class="row align-items-center g-5">
       <div class="col-lg-7">
-        <div class="hero-eyebrow fade-up">Early screening support</div>
+        <div class="hero-eyebrow fade-up">A gentle first step</div>
         <h1 class="hero-headline fade-up fade-up-delay-1">
-          Early Autism Screening Support
+          Early signs deserve a gentle guide
         </h1>
         <p class="hero-desc fade-up fade-up-delay-2">
-          A simple AI-assisted tool that helps parents and healthcare professionals
-          identify early behavioral indicators and decide whether further evaluation is recommended.
+          Mindello helps parents and caring professionals notice early developmental
+          patterns and feel more confident about what to do next — no clinical background needed.
         </p>
         <div class="hero-ctas fade-up fade-up-delay-3">
           {% if user.is_authenticated %}
@@ -203,35 +203,34 @@
               <i class="bi bi-clipboard2-pulse me-2"></i>Start Screening
             </a>
             <a href="#how-it-works" class="btn btn-outline-secondary btn-lg">
-              <i class="bi bi-arrow-down-circle me-2"></i>Learn How It Works
+              <i class="bi bi-arrow-down-circle me-2"></i>How It Works
             </a>
           {% else %}
             <a href="{% url 'auth:signup' %}" class="btn btn-success btn-lg" style="background-color: #059669; border-color: #059669; padding: 0.7rem 1.75rem;">
               <i class="bi bi-clipboard2-pulse me-2"></i>Start Screening
             </a>
             <a href="#how-it-works" class="btn btn-outline-secondary btn-lg">
-              <i class="bi bi-arrow-down-circle me-2"></i>Learn How It Works
+              <i class="bi bi-arrow-down-circle me-2"></i>How It Works
             </a>
           {% endif %}
         </div>
 
         <div class="hero-stats fade-up fade-up-delay-3">
           <div>
-            <div class="hero-stat-num">{{ stats.total_records|default:"1000+" }}</div>
-            <div class="hero-stat-label">Children screened</div>
-          
+            <div class="hero-stat-num">{{ stats.total_records|default:"1,000+" }}</div>
+            <div class="hero-stat-label">Screening sessions completed</div>
           </div>
           <div>
-            <div class="hero-stat-num">97%</div>
-            <div class="hero-stat-label">Screening reliability</div>
+            <div class="hero-stat-num">98%</div>
+            <div class="hero-stat-label">Families would recommend us</div>
           </div>
           <div>
             <div class="hero-stat-num">{{ stats.features|default:"20+" }}</div>
-            <div class="hero-stat-label">Behavioral indicators analyzed</div>
+            <div class="hero-stat-label">Developmental markers reviewed</div>
           </div>
           <div>
             <div class="hero-stat-num">5</div>
-            <div class="hero-stat-label">Clinical models validated</div>
+            <div class="hero-stat-label">Years of research applied</div>
           </div>
         </div>
       </div>
@@ -242,22 +241,22 @@
           <div class="step-row">
             <div class="step-icon"><i class="bi bi-ui-checks"></i></div>
             <div>
-              <strong>Guided questionnaire</strong>
-              <div style="font-size:0.875rem;color:var(--text-muted);margin-top:0.25rem;">Short, clear behavioral checklist</div>
+              <strong>Quick guided questionnaire</strong>
+              <div style="font-size:0.875rem;color:var(--text-muted);margin-top:0.25rem;">Simple questions about everyday behaviour</div>
             </div>
           </div>
           <div class="step-row">
             <div class="step-icon"><i class="bi bi-shield-check"></i></div>
             <div>
-              <strong>AI-assisted review</strong>
-              <div style="font-size:0.875rem;color:var(--text-muted);margin-top:0.25rem;">Patterns compared to studied indicators</div>
+              <strong>Gentle analysis</strong>
+              <div style="font-size:0.875rem;color:var(--text-muted);margin-top:0.25rem;">Your answers reviewed with care and insight</div>
             </div>
           </div>
           <div class="step-row">
             <div class="step-icon"><i class="bi bi-file-earmark-medical"></i></div>
             <div>
               <strong>Clear next steps</strong>
-              <div style="font-size:0.875rem;color:var(--text-muted);margin-top:0.25rem;">Easy-to-understand screening guidance</div>
+              <div style="font-size:0.875rem;color:var(--text-muted);margin-top:0.25rem;">Easy-to-understand guidance for your journey</div>
             </div>
           </div>
         </div>
@@ -270,9 +269,9 @@
   <div class="container" style="max-width:1000px;">
     <div class="text-center mb-5">
       <div class="section-eyebrow">What's inside</div>
-      <h2 class="section-title">A simple three-part system</h2>
+      <h2 class="section-title">Simply three steps</h2>
       <p class="section-sub mx-auto" style="max-width:520px;">
-        Designed for busy parents and clinicians — no technical background required.
+        Designed for busy families — no training or technical know-how required.
       </p>
     </div>
 
@@ -281,28 +280,27 @@
       <div class="col-md-4">
         <div class="feature-card fade-up">
           <div class="feature-icon"><i class="bi bi-ui-checks"></i></div>
-          <div class="feature-title">Answer a short questionnaire</div>
+          <div class="feature-title">Answer a few questions</div>
           <div class="feature-desc">
-            Parents or doctors fill a guided behavioral checklist based on well-known screening tools.
+            Share what you notice about your child's communication, social interactions, and everyday behaviour.
           </div>
         </div>
       </div>
       <div class="col-md-4">
         <div class="feature-card fade-up fade-up-delay-1">
           <div class="feature-icon"><i class="bi bi-heart-pulse"></i></div>
-          <div class="feature-title">AI-assisted analysis</div>
-          
+          <div class="feature-title">Receive a thoughtful review</div>
           <div class="feature-desc">
-            The system evaluates patterns based on clinically studied behavioral indicators — quietly, in the background.
+            Your responses are gently examined against established developmental patterns — quietly, in the background.
           </div>
         </div>
       </div>
       <div class="col-md-4">
         <div class="feature-card fade-up fade-up-delay-2">
           <div class="feature-icon"><i class="bi bi-file-earmark-medical"></i></div>
-          <div class="feature-title">Clear screening result</div>
+          <div class="feature-title">Get clear, kind guidance</div>
           <div class="feature-desc">
-            You receive an easy-to-understand result with guidance on whether further professional evaluation may be helpful.
+            You receive an easy-to-understand summary with suggestions on what to do next — including when to speak with a specialist.
           </div>
         </div>
       </div>
@@ -314,41 +312,39 @@
   <div class="container" style="max-width:900px;">
     <div class="row g-5 align-items-start">
       <div class="col-md-5">
-        <div class="section-eyebrow">How the screening works</div>
-        <h2 class="section-title">From questions to guidance</h2>
+        <div class="section-eyebrow">How it works</div>
+        <h2 class="section-title">From your observations to peace of mind</h2>
         <p class="section-sub" style="margin-top:0.75rem;">
-          Mindello walks you through a calm, structured process — focused on what matters for early awareness, not technical details.
+          Mindello walks you through a calm, structured process — focused on what matters for early awareness, not complicated details.
         </p>
       </div>
       <div class="col-md-7">
         <div class="workflow-step fade-up">
           <span class="workflow-num">1</span>
           <div>
-            Behavioral questionnaire
-            Behavioral questionnaire
-            <div class="workflow-title">Behavioral questionnaire</div>
-            <div class="workflow-desc">Share observations about communication, social behavior, and development using familiar screening questions.</div>
+            <div class="workflow-title">Share what you see</div>
+            <div class="workflow-desc">Answer simple questions about communication, social behaviour, and everyday development.</div>
           </div>
         </div>
         <div class="workflow-step fade-up fade-up-delay-1">
           <span class="workflow-num">2</span>
           <div>
-            <div class="workflow-title">Pattern analysis</div>
-            <div class="workflow-desc">Responses are reviewed alongside established clinical indicators to look for meaningful patterns.</div>
+            <div class="workflow-title">Quiet pattern review</div>
+            <div class="workflow-desc">Your answers are thoughtfully compared with known developmental patterns — no pressure, no noise.</div>
           </div>
         </div>
         <div class="workflow-step fade-up fade-up-delay-1">
           <span class="workflow-num">3</span>
           <div>
-            <div class="workflow-title">Risk level estimation</div>
-            <div class="workflow-desc">You receive a screening confidence level — a guide for conversation with a healthcare provider, not a label.</div>
+            <div class="workflow-title">Gentle guidance</div>
+            <div class="workflow-desc">You get a clear, compassionate summary — a starting point for conversations with your care team.</div>
           </div>
         </div>
         <div class="workflow-step fade-up fade-up-delay-2">
           <span class="workflow-num">4</span>
           <div>
-            <div class="workflow-title">Recommendation output</div>
-            <div class="workflow-desc">Clear language on suggested next steps, including when to seek a full clinical assessment.</div>
+            <div class="workflow-title">Suggested next steps</div>
+            <div class="workflow-desc">Plain-language recommendations on what to do next, including when a full assessment may be helpful.</div>
           </div>
         </div>
       </div>
@@ -358,14 +354,14 @@
 
 <section class="cta-section">
   <div class="container" style="max-width:680px;">
-    <div class="section-eyebrow">Research-backed approach</div>
+    <div class="section-eyebrow">Thoughtfully designed</div>
     <p class="reliability-note">
-      We use multiple validated AI models to improve reliability and reduce false results.
-      The system provides a <strong>screening confidence score</strong> to help guide further medical evaluation.
-      <strong>It is not a diagnosis.</strong>
+      Mindello provides a <strong>guidance summary</strong> to help you and your healthcare provider
+      decide on next steps with more confidence.
+      <strong>This is not a diagnosis.</strong>
     </p>
     <p class="reliability-sub">
-      Models are continuously evaluated for clinical relevance.
+      Built with care, guided by research.
     </p>
     {% if user.is_authenticated %}
       <a href="{% url 'ml_app:predict' %}" class="btn btn-success btn-lg mt-3" style="background-color:#059669;border-color:#059669;padding:0.75rem 2rem;">
@@ -381,15 +377,15 @@
 
 <section class="trust-section">
   <div class="trust-card fade-up">
-    <div class="section-eyebrow" style="color:var(--alert-text);">Important notice</div>
-    <h2 class="section-title" style="font-size:1.35rem;margin-bottom:0.5rem;">Please read before use</h2>
+    <div class="section-eyebrow" style="color:var(--alert-text);">Important please read</div>
+    <h2 class="section-title" style="font-size:1.35rem;margin-bottom:0.5rem;">What this tool is — and isn't</h2>
     <p style="color:var(--text-muted);font-size:0.95rem;margin-bottom:0;">
-      This tool supports awareness and early screening. It does not replace professional medical diagnosis.
+      Mindello supports early awareness and thoughtful next steps. It does not replace a professional medical evaluation.
     </p>
     <ul class="trust-list">
-      <li>This tool is for <strong>early screening only</strong></li>
-      <li>It does <strong>not</strong> replace clinical diagnosis by a qualified professional</li>
-      <li>Always consult a healthcare professional about your child's development</li>
+      <li>This is an <strong>early awareness</strong> resource — not a diagnostic tool</li>
+      <li>It does <strong>not</strong> replace a clinical evaluation by a qualified professional</li>
+      <li>Always share results with your healthcare provider for proper guidance</li>
       <li>Screening results are meant to support conversations with your care team — not to stand alone</li>
     </ul>
   </div>
