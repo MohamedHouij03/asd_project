@@ -29,22 +29,13 @@
 
 ## Demo
 
-> **Add your demo video here.**
-> Replace the block below with an embedded video, a GIF, or a link to a hosted recording.
 
 <div align="center">
 
 <!-- Option A: YouTube embed (replace VIDEO_ID) -->
-<!-- [![Demo Video](https://img.youtube.com/vi/VIDEO_ID/maxresdefault.jpg)](https://www.youtube.com/watch?v=VIDEO_ID) -->
+[![Demo Video](https://img.youtube.com/vi/S5mU2ffHBGM/maxresdefault.jpg)](https://www.youtube.com/watch?v=S5mU2ffHBGM) 
 
-<!-- Option B: Local GIF or screenshot -->
-<!-- <img src="docs/demo.gif" alt="Mindello demo" width="800"/> -->
 
-<!-- Option C: Placeholder until you record -->
-```
-[ Demo video coming soon ]
-Place your screen recording, GIF, or YouTube thumbnail here.
-```
 
 </div>
 
